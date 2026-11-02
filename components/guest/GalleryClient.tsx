@@ -34,9 +34,9 @@ export function GalleryClient({
     setLoadFailed(false);
     const last = photos[photos.length - 1];
     try {
-      // Cursor compuesto (fecha + id): coincide con el orden del servidor y no pierde fotos con la misma fecha.
+      // Cursor compuesto (posición + id): coincide con el orden que definió el admin.
       const res = await fetch(
-        `/api/photos?cursor=${encodeURIComponent(last?.created_at ?? "")}&cursorId=${encodeURIComponent(last?.id ?? "")}`
+        `/api/photos?cursor=${last?.position ?? ""}&cursorId=${encodeURIComponent(last?.id ?? "")}`
       );
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: { photos: PhotoMeta[] } = await res.json();

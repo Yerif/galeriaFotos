@@ -4,8 +4,8 @@ import { DEMO_MODE, DEMO_PAGE_SIZE, demoPhotos } from "@/lib/demo";
 
 const PAGE_SIZE = 24;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-// El cursor se interpola en un filtro de PostgREST: solo se aceptan caracteres de una fecha ISO.
-const ISO_DATE = /^[0-9T:.+\-Z]+$/;
+// El cursor se interpola en un filtro de PostgREST: solo se aceptan dígitos.
+const DIGITS = /^\d{1,9}$/;
 
 export async function GET(request: NextRequest) {
   const cursor = request.nextUrl.searchParams.get("cursor");
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ photos: demoPhotos.slice(start, start + DEMO_PAGE_SIZE) });
   }
 
-  if (cursor && (!ISO_DATE.test(cursor) || !cursorId || !UUID.test(cursorId))) {
+  if (cursor && (!DIGITS.test(cursor) || !cursorId || !UUID.test(cursorId))) {
     return NextResponse.json({ error: "invalid_cursor" }, { status: 400 });
   }
 
@@ -30,15 +30,15 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from("photos")
-    .select("id, original_filename, width, height, created_at")
+    .select("id, original_filename, width, height, created_at, position")
     .eq("event_id", event.id)
-    .order("created_at", { ascending: false })
-    .order("id", { ascending: false })
+    .order("position", { ascending: true })
+    .order("id", { ascending: true })
     .limit(PAGE_SIZE);
 
-  // Cursor compuesto (fecha + id): si dos fotos comparten created_at, ninguna se pierde entre páginas.
+  // Cursor compuesto (posición + id), el mismo orden que el del admin: ninguna foto se pierde entre páginas.
   if (cursor && cursorId) {
-    query = query.or(`created_at.lt."${cursor}",and(created_at.eq."${cursor}",id.lt.${cursorId})`);
+    query = query.or(`position.gt.${cursor},and(position.eq.${cursor},id.gt.${cursorId})`);
   }
 
   const { data: photos, error } = await query;

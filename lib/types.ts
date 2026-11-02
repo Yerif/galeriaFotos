@@ -4,4 +4,5 @@ export type PhotoMeta = {
   width: number | null;
   height: number | null;
   created_at: string;
+  position: number;
 };

@@ -11,6 +11,7 @@ export type DemoPhoto = {
   width: number;
   height: number;
   created_at: string;
+  position: number;
 };
 
 // Relaciones de aspecto variadas (horizontal, vertical, cuadrada) para probar la grilla justificada.
@@ -37,6 +38,7 @@ export const demoPhotos: DemoPhoto[] = Array.from({ length: DEMO_COUNT }).map((_
     width,
     height,
     created_at: new Date(DEMO_BASE_TIME - i * 3600_000).toISOString(),
+    position: i + 1,
   };
 });
 

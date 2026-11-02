@@ -2,6 +2,9 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getAdminSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { DEMO_MODE, demoPhotos, demoPhotoUrl } from "@/lib/demo";
+import { isCompleteOrder } from "@/lib/reorder";
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function GET() {
   if (DEMO_MODE) {
@@ -10,6 +13,7 @@ export async function GET() {
         id: p.id,
         originalFilename: p.original_filename,
         createdAt: p.created_at,
+        position: p.position,
         thumbnailUrl: demoPhotoUrl(p.id),
       })),
     });
@@ -24,26 +28,28 @@ export async function GET() {
 
   const { data: photos, error } = await supabase
     .from("photos")
-    .select("id, original_filename, storage_path_thumb, created_at")
-    .order("created_at", { ascending: false });
+    .select("id, original_filename, storage_path_thumb, created_at, position")
+    .order("position", { ascending: true })
+    .order("id", { ascending: true });
 
   if (error) {
     return NextResponse.json({ error: "query_failed", detail: error.message }, { status: 500 });
   }
 
-  const rows = await Promise.all(
-    (photos ?? []).map(async (photo) => {
-      const { data } = await supabase.storage
-        .from("photos")
-        .createSignedUrl(photo.storage_path_thumb, 600);
-      return {
-        id: photo.id,
-        originalFilename: photo.original_filename,
-        createdAt: photo.created_at,
-        thumbnailUrl: data?.signedUrl ?? null,
-      };
-    })
-  );
+  // Una sola llamada para firmar todas las miniaturas (antes era una por foto).
+  const paths = (photos ?? []).map((p) => p.storage_path_thumb);
+  const { data: signed } = paths.length
+    ? await supabase.storage.from("photos").createSignedUrls(paths, 3600)
+    : { data: [] };
+  const urlByPath = new Map((signed ?? []).map((s) => [s.path, s.signedUrl]));
+
+  const rows = (photos ?? []).map((photo) => ({
+    id: photo.id,
+    originalFilename: photo.original_filename,
+    createdAt: photo.created_at,
+    position: photo.position,
+    thumbnailUrl: urlByPath.get(photo.storage_path_thumb) ?? null,
+  }));
 
   return NextResponse.json({ rows });
 }
@@ -83,10 +89,19 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const { data: last } = await supabase
+    .from("photos")
+    .select("position")
+    .eq("event_id", event.id)
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const { data: photo, error } = await supabase
     .from("photos")
     .insert({
       event_id: event.id,
+      position: (last?.position ?? 0) + 1,
       storage_path_display: displayPath,
       storage_path_thumb: thumbPath,
       original_filename: originalFilename,
@@ -103,6 +118,47 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ photo });
+}
+
+// Guarda el orden completo elegido por el admin: { ids: [...] } en el orden en que deben mostrarse.
+export async function PATCH(request: NextRequest) {
+  // En modo demo no hay sesión de admin (GET ya lo permite): se responde ok sin tocar nada.
+  if (!DEMO_MODE && !(await getAdminSession())) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json().catch(() => null);
+  const ids: unknown = body?.ids;
+  if (!Array.isArray(ids) || ids.length > 5000 || !ids.every((id) => typeof id === "string")) {
+    return NextResponse.json({ error: "invalid_body" }, { status: 400 });
+  }
+
+  if (DEMO_MODE) {
+    return NextResponse.json({ ok: true });
+  }
+
+  const orderedIds = ids as string[];
+  if (!orderedIds.every((id) => UUID.test(id))) {
+    return NextResponse.json({ error: "invalid_id" }, { status: 400 });
+  }
+
+  const supabase = createAdminClient();
+  const { data: existing, error: listError } = await supabase.from("photos").select("id");
+  if (listError) {
+    return NextResponse.json({ error: "query_failed", detail: listError.message }, { status: 500 });
+  }
+
+  // Si se subió o borró una foto mientras el admin ordenaba, el orden ya no es completo: que recargue.
+  if (!isCompleteOrder(orderedIds, (existing ?? []).map((p) => p.id))) {
+    return NextResponse.json({ error: "stale_order" }, { status: 409 });
+  }
+
+  const { error } = await supabase.rpc("reorder_photos", { photo_ids: orderedIds });
+  if (error) {
+    return NextResponse.json({ error: "reorder_failed", detail: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(request: NextRequest) {

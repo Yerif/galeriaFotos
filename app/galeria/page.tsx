@@ -38,10 +38,10 @@ async function GalleryContent() {
 
   const { data: photos } = await supabase
     .from("photos")
-    .select("id, original_filename, width, height, created_at")
+    .select("id, original_filename, width, height, created_at, position")
     .eq("event_id", event.id)
-    .order("created_at", { ascending: false })
-    .order("id", { ascending: false })
+    .order("position", { ascending: true })
+    .order("id", { ascending: true })
     .limit(PAGE_SIZE);
 
   return <GalleryClient initialPhotos={photos ?? []} totalCount={totalCount ?? photos?.length ?? 0} deadlineAt={event.deadline_at} />;
