@@ -20,7 +20,11 @@ export default function AdminLoginPage() {
 
     if (!res.ok) {
       setLoading(false);
-      setError("Ese correo no tiene acceso.");
+      if (res.status === 500) {
+        setError("Faltan variables de entorno en el servidor (ADMIN_EMAIL / ADMIN_SESSION_SECRET).");
+      } else {
+        setError("Ese correo no tiene acceso.");
+      }
       return;
     }
 
