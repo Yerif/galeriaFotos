@@ -43,6 +43,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   position: relative;
+  overflow-x: clip;
 }
 
 /* Grano de película: tile de ruido blanco con alfa variable, mezcla normal (sin mix-blend-mode,
@@ -118,21 +119,54 @@ body::after {
   }
 }
 
-.animate-flicker {
-  animation: flicker 5s infinite;
+/* Niebla de fondo. Siempre hay una versión CSS (HTML inicial, respaldo en dispositivos lentos o con
+   reduce-motion); la de WebGL entra encima con fundido y apaga la CSS. */
+.fog {
+  position: absolute;
+  top: -1.5rem;
+  bottom: -1rem;
+  /* A sangre: ocupa todo el ancho de la pantalla aunque el contenido tenga márgenes. */
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
 }
 
-@keyframes float-slow {
-  0%, 100% {
-    transform: translateY(0) rotate(-1deg);
-  }
-  50% {
-    transform: translateY(-10px) rotate(1deg);
-  }
+.fog-css {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 200%;
+  background:
+    radial-gradient(ellipse 26% 42% at 16% 62%, rgb(154 17 21 / 0.3), transparent 100%),
+    radial-gradient(ellipse 22% 36% at 44% 72%, rgb(154 17 21 / 0.2), transparent 100%),
+    radial-gradient(ellipse 26% 42% at 66% 58%, rgb(154 17 21 / 0.28), transparent 100%),
+    radial-gradient(ellipse 22% 36% at 90% 70%, rgb(154 17 21 / 0.2), transparent 100%);
+  will-change: transform;
+  animation: fog-drift 60s linear infinite alternate;
+  transition: opacity 800ms var(--ease-out);
 }
 
-.animate-float-slow {
-  animation: float-slow 7s ease-in-out infinite;
+.fog[data-gl="true"] .fog-css {
+  opacity: 0;
+  animation: none;
+  will-change: auto;
+}
+
+.fog-canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 900ms var(--ease-out);
+}
+
+.fog[data-gl="true"] .fog-canvas {
+  opacity: 1;
+}
+
+@keyframes fog-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 @keyframes reveal-up {

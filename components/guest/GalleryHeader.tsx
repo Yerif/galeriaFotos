@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Countdown } from "@/components/guest/Countdown";
+import { FogBackground } from "@/components/shared/FogBackground";
 
 export function GalleryHeader({ deadlineAt }: { deadlineAt: string | null }) {
   const heroRef = useRef<HTMLElement>(null);
@@ -26,10 +27,13 @@ export function GalleryHeader({ deadlineAt }: { deadlineAt: string | null }) {
         <Countdown deadlineAt={deadlineAt} variant="compact" />
       </div>
 
-      <header ref={heroRef} className="mb-6 flex flex-col items-center gap-2 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-foreground/60">La fiesta de Halloween</p>
-        <h1 className="title-glow font-display text-5xl text-blood-bright">La Galería</h1>
-        <Countdown deadlineAt={deadlineAt} variant="hero" />
+      <header ref={heroRef} className="relative mb-6 text-center">
+        <FogBackground />
+        <div className="relative z-10 flex flex-col items-center gap-2">
+          <p className="text-xs uppercase tracking-[0.3em] text-foreground/60">La fiesta de Halloween</p>
+          <h1 className="title-glow font-display text-5xl text-blood-bright">La Galería</h1>
+          <Countdown deadlineAt={deadlineAt} variant="hero" />
+        </div>
       </header>
     </>
   );
