@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0d0510;
+  --foreground: #f5ece0;
+  --color-pumpkin: #ff7518;
+  --color-pumpkin-dark: #c8530c;
+  --color-witch: #6b2fa0;
+  --color-witch-dark: #2e1a47;
+  --color-slime: #8bd450;
+  --color-panel: #17091f;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-pumpkin: var(--color-pumpkin);
+  --color-pumpkin-dark: var(--color-pumpkin-dark);
+  --color-witch: var(--color-witch);
+  --color-witch-dark: var(--color-witch-dark);
+  --color-slime: var(--color-slime);
+  --color-panel: var(--color-panel);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+body {
+  background: radial-gradient(circle at top, var(--color-witch-dark) 0%, var(--background) 60%);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
+  letter-spacing: 0.02em;
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow {
+    animation: none;
+  }
+}
