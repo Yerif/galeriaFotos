@@ -3,9 +3,7 @@
 import { useMemo } from "react";
 import YetAnotherLightbox from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import Counter from "yet-another-react-lightbox/plugins/counter";
 import "yet-another-react-lightbox/styles.css";
-import "yet-another-react-lightbox/plugins/counter.css";
 import { DownloadButton } from "@/components/guest/DownloadButton";
 import type { PhotoMeta } from "@/lib/types";
 
@@ -18,15 +16,15 @@ declare module "yet-another-react-lightbox" {
 export function Lightbox({
   photos,
   index,
+  total,
   onClose,
   onIndexChange,
-  guestName,
 }: {
   photos: PhotoMeta[];
   index: number;
+  total: number;
   onClose: () => void;
   onIndexChange: (index: number) => void;
-  guestName: string;
 }) {
   const slides = useMemo(
     () =>
@@ -47,7 +45,7 @@ export function Lightbox({
       close={onClose}
       index={Math.max(index, 0)}
       slides={slides}
-      plugins={[Zoom, Counter]}
+      plugins={[Zoom]}
       on={{ view: ({ index: i }) => onIndexChange(i) }}
       controller={{ closeOnPullDown: true, closeOnBackdropClick: true }}
       // finito + precarga de 1: al abrir la primera foto no se bajan las del otro extremo (datos móviles).
@@ -76,9 +74,15 @@ export function Lightbox({
         },
         controls: () =>
           current ? (
+            <>
+              {/* Total real de la galería (no solo lo ya cargado por paginación). */}
+              <div className="lb-counter" aria-live="polite">
+                {index + 1} / {total}
+              </div>
             <div className="lb-download-bar">
-              <DownloadButton key={current.id} photo={current} guestName={guestName} />
+              <DownloadButton key={current.id} photo={current} />
             </div>
+            </>
           ) : null,
       }}
     />

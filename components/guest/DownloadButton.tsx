@@ -1,20 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { toJpgFilename } from "@/lib/filename";
-import {
-  fetchPhotoBlob,
-  isShareCapable,
-  logDownload,
-  saveFlow,
-  shareFile,
-  startFileDownload,
-} from "@/lib/shareOrDownload";
+import { useEffect } from "react";
+import { CheckIcon, DownloadIcon } from "@/components/guest/DownloadIcon";
+import { usePhotoSave, type SaveStatus } from "@/lib/usePhotoSave";
 import type { PhotoMeta } from "@/lib/types";
 
-type Status = "idle" | "preparing" | "shared" | "file" | "error";
-
-const LIVE_MESSAGE: Record<Status, string> = {
+const LIVE_MESSAGE: Record<SaveStatus, string> = {
   idle: "",
   preparing: "Preparando la foto",
   shared: "Foto guardada",
@@ -22,64 +13,16 @@ const LIVE_MESSAGE: Record<Status, string> = {
   error: "No se pudo guardar la foto",
 };
 
-// Se monta una vez por foto (el padre le pone key): el estado y el blob precargado se descartan al cambiar de foto.
-export function DownloadButton({ photo, guestName }: { photo: PhotoMeta; guestName: string }) {
-  const shareCapable = useMemo(() => isShareCapable(), []);
-  const [status, setStatus] = useState<Status>("idle");
-  const blobRef = useRef<Blob | null>(null);
-  const promiseRef = useRef<Promise<Blob> | null>(null);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+// Se monta una vez por foto (el padre le pone key): el estado y el archivo precargado se descartan al cambiar de foto.
+export function DownloadButton({ photo }: { photo: PhotoMeta }) {
+  const { status, save, shareCapable, prefetch } = usePhotoSave(photo);
 
-  const loadBlob = useCallback(() => {
-    if (!promiseRef.current) {
-      const promise = fetchPhotoBlob(photo.id).then((blob) => {
-        blobRef.current = blob;
-        return blob;
-      });
-      // Si falla, se permite reintentar en el próximo toque.
-      promise.catch(() => {
-        promiseRef.current = null;
-      });
-      promiseRef.current = promise;
-    }
-    return promiseRef.current;
-  }, [photo.id]);
-
-  // Precarga el archivo para poder llamar a share() de forma síncrona en el toque (requisito de iOS).
   // El retraso deja que el <img> del lightbox termine primero y la copia salga del caché HTTP.
   useEffect(() => {
     if (!shareCapable) return;
-    const timer = setTimeout(() => void loadBlob(), 350);
+    const timer = setTimeout(prefetch, 350);
     return () => clearTimeout(timer);
-  }, [shareCapable, loadBlob]);
-
-  useEffect(() => () => clearTimeout(resetTimer.current), []);
-
-  async function handleSave() {
-    if (status === "preparing") return;
-    clearTimeout(resetTimer.current);
-    setStatus("preparing");
-    try {
-      const outcome = await saveFlow({
-        shareCapable,
-        readyBlob: () => blobRef.current,
-        loadBlob,
-        share: shareFile,
-        log: () => logDownload(photo.id, guestName),
-        fallback: () => startFileDownload(photo.id, guestName),
-        fileName: toJpgFilename(photo.original_filename),
-      });
-      if (outcome === "cancelled") {
-        setStatus("idle");
-        return;
-      }
-      setStatus(outcome);
-      if (outcome === "shared" && "vibrate" in navigator) navigator.vibrate(15);
-      resetTimer.current = setTimeout(() => setStatus("idle"), 2600);
-    } catch {
-      setStatus("error");
-    }
-  }
+  }, [shareCapable, prefetch]);
 
   const label =
     status === "preparing"
@@ -88,7 +31,7 @@ export function DownloadButton({ photo, guestName }: { photo: PhotoMeta; guestNa
         ? "Reintentar"
         : shareCapable
           ? "Guardar en Fotos"
-          : "Descargar";
+          : "Descargar foto";
 
   return (
     <div className="relative flex flex-col items-center">
@@ -102,10 +45,15 @@ export function DownloadButton({ photo, guestName }: { photo: PhotoMeta; guestNa
       )}
       <button
         type="button"
-        onClick={handleSave}
+        onClick={save}
         disabled={status === "preparing"}
-        className="min-h-12 border border-blood bg-blood/90 px-7 py-3 font-display text-lg tracking-widest text-foreground transition active:scale-95 disabled:opacity-60"
+        className="inline-flex min-h-12 items-center gap-3 border border-blood bg-blood/90 px-7 py-3 font-display text-lg tracking-widest text-foreground transition active:scale-95 disabled:opacity-60"
       >
+        {status === "shared" || status === "file" ? (
+          <CheckIcon className="h-5 w-5" />
+        ) : (
+          <DownloadIcon className="h-5 w-5" />
+        )}
         {label}
       </button>
       {status === "error" && (

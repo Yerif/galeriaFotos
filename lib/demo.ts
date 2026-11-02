@@ -26,6 +26,9 @@ const DEMO_DIMENSIONS: Array<[number, number]> = [
   [800, 1000],
 ];
 
+const DEMO_BASE_TIME = Date.parse("2026-11-01T12:00:00Z");
+export const DEMO_PAGE_SIZE = 24;
+
 export const demoPhotos: DemoPhoto[] = Array.from({ length: DEMO_COUNT }).map((_, i) => {
   const [width, height] = DEMO_DIMENSIONS[i % DEMO_DIMENSIONS.length];
   return {
@@ -33,7 +36,7 @@ export const demoPhotos: DemoPhoto[] = Array.from({ length: DEMO_COUNT }).map((_
     original_filename: `halloween-${i + 1}.jpg`,
     width,
     height,
-    created_at: new Date(Date.now() - i * 3600_000).toISOString(),
+    created_at: new Date(DEMO_BASE_TIME - i * 3600_000).toISOString(),
   };
 });
 
