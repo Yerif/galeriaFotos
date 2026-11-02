@@ -20,19 +20,19 @@ export function IntroTitleCard({ onDone }: { onDone: () => void }) {
         className="reveal text-xs uppercase tracking-[0.4em] text-foreground/60"
         style={{ animationDelay: "100ms" }}
       >
-        Una producción de
+        Fotos de la fiesta
       </p>
       <h1
-        className="title-glow flicker-in mt-2 font-display text-7xl text-blood-bright"
+        className="title-glow flicker-in mt-2 whitespace-nowrap font-display text-5xl text-blood-bright"
         style={{ animationDelay: "200ms" }}
       >
-        La Galería
+        Halloween 2026
       </h1>
       <p
         className="reveal mt-3 text-sm uppercase tracking-[0.3em] text-foreground/80"
         style={{ animationDelay: "750ms" }}
       >
-        Fiesta de Halloween · 7 días
+        Disponibles por 7 días
       </p>
       <p
         className="reveal absolute bottom-[16vh] text-xs uppercase tracking-widest text-foreground/60"

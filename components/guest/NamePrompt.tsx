@@ -23,10 +23,10 @@ export function NamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
         className="scanlines w-full max-w-sm border border-blood/40 bg-panel p-6 shadow-[0_0_40px_rgba(154,17,21,0.25)]"
       >
         <p className="text-center text-xs uppercase tracking-[0.3em] text-foreground/60">
-          Una producción de
+          Fotos de la fiesta
         </p>
         <h1 className="title-glow mt-1 text-center font-display text-4xl text-blood-bright">
-          La Galería
+          Halloween 2026
         </h1>
         <p className="mt-3 text-center text-sm leading-relaxed text-foreground/70">
           Identifícate para entrar. Sabremos qué fotos te llevaste.

@@ -14,7 +14,7 @@ const displayFont = Bebas_Neue({
 });
 
 export const metadata: Metadata = {
-  title: "La Galería — Halloween",
+  title: "Halloween 2026",
   description: "Fotos de la fiesta. Disponibles solo por 7 días. Después, desaparecen.",
 };
 

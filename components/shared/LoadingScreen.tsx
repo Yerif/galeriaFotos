@@ -9,7 +9,7 @@ export function LoadingScreen({ label = "Cargando..." }: { label?: string }) {
         <div className="fog-css" />
       </div>
       <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-        <span className="title-glow font-display text-4xl text-blood-bright">La Galería</span>
+        <span className="title-glow font-display text-4xl text-blood-bright">Halloween 2026</span>
         <Spinner />
         <p className="text-xs uppercase tracking-widest text-foreground/60">{label}</p>
       </div>

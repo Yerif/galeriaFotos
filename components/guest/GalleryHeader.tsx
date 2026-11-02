@@ -23,15 +23,15 @@ export function GalleryHeader({ deadlineAt }: { deadlineAt: string | null }) {
   return (
     <>
       <div ref={barRef} data-stuck="false" className="sticky-bar" aria-hidden="true">
-        <span className="title-glow font-display text-xl tracking-widest text-blood-bright">La Galería</span>
+        <span className="title-glow font-display text-xl tracking-widest text-blood-bright">Halloween 2026</span>
         <Countdown deadlineAt={deadlineAt} variant="compact" />
       </div>
 
       <header ref={heroRef} className="relative mb-6 text-center">
         <FogBackground />
         <div className="relative z-10 flex flex-col items-center gap-2">
-          <p className="text-xs uppercase tracking-[0.3em] text-foreground/60">La fiesta de Halloween</p>
-          <h1 className="title-glow font-display text-5xl text-blood-bright">La Galería</h1>
+          <p className="text-xs uppercase tracking-[0.3em] text-foreground/60">Fotos de la fiesta</p>
+          <h1 className="title-glow whitespace-nowrap font-display text-4xl text-blood-bright min-[380px]:text-5xl">Halloween 2026</h1>
           <Countdown deadlineAt={deadlineAt} variant="hero" />
         </div>
       </header>
