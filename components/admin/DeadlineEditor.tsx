@@ -37,17 +37,17 @@ export function DeadlineEditor({ initialDeadline }: { initialDeadline: string | 
         type="datetime-local"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="rounded-lg border border-witch/50 bg-background px-4 py-3 text-foreground outline-none focus:border-pumpkin"
+        className="border border-ash bg-background px-4 py-3 text-foreground outline-none focus:border-blood"
       />
       <button
         type="button"
         onClick={handleSave}
         disabled={saving}
-        className="rounded-lg bg-pumpkin px-4 py-3 font-semibold text-black disabled:opacity-50"
+        className="border border-blood bg-blood/90 px-4 py-3 font-display tracking-widest text-foreground disabled:opacity-50"
       >
         {saving ? "Guardando..." : "Guardar fecha límite"}
       </button>
-      {saved && <p className="text-sm text-slime">Guardado ✅</p>}
+      {saved && <p className="text-sm text-acid">Guardado</p>}
     </div>
   );
 }

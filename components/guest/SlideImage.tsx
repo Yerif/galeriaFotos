@@ -35,7 +35,7 @@ export function SlideImage({
         <img
           src={src}
           alt=""
-          className="max-h-[75vh] w-auto max-w-full rounded-lg object-contain"
+          className="max-h-[75vh] w-auto max-w-full border border-ash object-contain"
         />
       ) : (
         <Spinner />

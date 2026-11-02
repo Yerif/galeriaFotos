@@ -6,7 +6,7 @@ import * as THREE from "three";
 
 const PARTICLE_COUNT = 40;
 
-function Embers() {
+function DustMotes() {
   const pointsRef = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
@@ -25,11 +25,11 @@ function Embers() {
   useFrame((state) => {
     if (!pointsRef.current) return;
     const t = state.clock.getElapsedTime();
-    pointsRef.current.rotation.y = t * 0.03;
+    pointsRef.current.rotation.y = t * 0.012;
     const attr = pointsRef.current.geometry.attributes.position as THREE.BufferAttribute;
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const y = attr.getY(i);
-      attr.setY(i, y + Math.sin(t + i) * 0.0015);
+      attr.setY(i, y + Math.sin(t * 0.6 + i) * 0.0008);
     }
     attr.needsUpdate = true;
   });
@@ -40,11 +40,11 @@ function Embers() {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        color="#ff7518"
-        size={0.07}
+        color="#c9a227"
+        size={0.035}
         sizeAttenuation
         transparent
-        opacity={0.85}
+        opacity={0.35}
       />
     </points>
   );
@@ -75,7 +75,7 @@ export default function ThreeScene() {
       gl={{ antialias: false, alpha: true, powerPreference: "low-power" }}
     >
       <ambientLight intensity={0.6} />
-      <Embers />
+      <DustMotes />
     </Canvas>
   );
 }

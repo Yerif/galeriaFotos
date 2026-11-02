@@ -30,13 +30,13 @@ export function AdminStatsTable() {
       {rows.map((row) => (
         <li
           key={row.id}
-          className="flex items-center gap-3 rounded-lg border border-witch/30 bg-panel p-2"
+          className="flex items-center gap-3 border border-ash bg-panel p-2"
         >
           {row.thumbnailUrl && (
             <img
               src={row.thumbnailUrl}
               alt=""
-              className="h-14 w-14 shrink-0 rounded object-cover"
+              className="h-14 w-14 shrink-0 border border-ash object-cover"
             />
           )}
           <div className="flex-1 overflow-hidden">

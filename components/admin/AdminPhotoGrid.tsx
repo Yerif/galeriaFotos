@@ -40,16 +40,16 @@ export function AdminPhotoGrid() {
   return (
     <div className="grid grid-cols-3 gap-2">
       {rows.map((row) => (
-        <div key={row.id} className="relative aspect-square overflow-hidden rounded-lg bg-panel">
+        <div key={row.id} className="relative aspect-square overflow-hidden border border-ash bg-panel">
           {row.thumbnailUrl && (
             <img src={row.thumbnailUrl} alt="" className="h-full w-full object-cover" />
           )}
           <button
             type="button"
             onClick={() => handleDelete(row.id)}
-            className="absolute right-1 top-1 rounded-full bg-black/70 px-2 py-1 text-xs text-white"
+            className="absolute right-1 top-1 border border-blood/60 bg-black/80 px-2 py-0.5 text-[10px] uppercase tracking-widest text-blood"
           >
-            🗑️
+            Borrar
           </button>
         </div>
       ))}

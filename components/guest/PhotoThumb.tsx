@@ -49,7 +49,7 @@ export function PhotoThumb({
       ref={ref}
       type="button"
       onClick={onOpen}
-      className="relative aspect-square overflow-hidden rounded-lg bg-panel"
+      className="relative aspect-square overflow-hidden border border-ash bg-panel"
     >
       {src ? (
         <img
@@ -57,10 +57,10 @@ export function PhotoThumb({
           alt=""
           loading="lazy"
           decoding="async"
-          className="h-full w-full object-cover transition-transform active:scale-95"
+          className="h-full w-full object-cover opacity-90 grayscale-[15%] transition-transform active:scale-95"
         />
       ) : (
-        <div className="h-full w-full animate-pulse bg-witch/20" />
+        <div className="h-full w-full animate-pulse bg-ash/30" />
       )}
     </button>
   );

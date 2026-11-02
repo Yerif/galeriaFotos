@@ -1,8 +1,8 @@
 export function CountdownBanner({ daysRemaining }: { daysRemaining: number | null }) {
   if (daysRemaining === null) {
     return (
-      <div className="rounded-lg bg-witch/30 px-4 py-2 text-center text-sm text-foreground/80">
-        Las fotos todavía no tienen fecha límite de descarga.
+      <div className="border border-ash px-4 py-2 text-center text-xs uppercase tracking-widest text-foreground/60">
+        Sin fecha límite todavía
       </div>
     );
   }
@@ -11,13 +11,15 @@ export function CountdownBanner({ daysRemaining }: { daysRemaining: number | nul
 
   return (
     <div
-      className={`rounded-lg px-4 py-2 text-center text-sm font-medium ${
-        urgent ? "bg-pumpkin/90 text-black" : "bg-witch/30 text-foreground/90"
+      className={`border px-4 py-2 text-center text-xs uppercase tracking-widest ${
+        urgent
+          ? "animate-flicker border-blood bg-blood/20 text-blood"
+          : "border-ash text-foreground/70"
       }`}
     >
       {daysRemaining === 0
-        ? "⏳ Último día para descargar tus fotos"
-        : `⏳ Quedan ${daysRemaining} día${daysRemaining === 1 ? "" : "s"} para descargar tus fotos`}
+        ? "Última noche para descargar"
+        : `Quedan ${daysRemaining} día${daysRemaining === 1 ? "" : "s"} antes de que desaparezcan`}
     </div>
   );
 }

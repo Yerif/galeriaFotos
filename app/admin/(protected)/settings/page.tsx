@@ -13,7 +13,7 @@ export default async function AdminSettingsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-display text-2xl text-pumpkin">Ajustes</h1>
+      <h1 className="title-glow font-display text-3xl text-blood">Ajustes</h1>
       <p className="text-sm text-foreground/70">
         Por defecto, la galería se bloquea 7 días después de subir la primera foto.
         Puedes ajustar manualmente la fecha límite aquí.

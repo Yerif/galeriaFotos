@@ -1,4 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="900">
-  <rect width="900" height="900" fill="#2e1a47"/>
-  <text x="50%" y="52%" font-size="340" text-anchor="middle" dominant-baseline="middle">💀</text>
+  <defs>
+    <filter id="grain8">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.08 0"/>
+    </filter>
+  </defs>
+  <rect width="900" height="900" fill="#2a1210"/>
+  <rect width="900" height="900" filter="url(#grain8)"/>
+  <line x1="0" y1="670" x2="900" y2="670" stroke="#9a1115" stroke-width="2" opacity="0.5"/>
+  <text x="50%" y="92%" font-family="monospace" font-size="22" fill="#9a1115" text-anchor="middle" opacity="0.85" letter-spacing="4">FRAME 08</text>
 </svg>

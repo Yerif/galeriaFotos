@@ -8,7 +8,7 @@ export default function AdminUploadPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="font-display text-2xl text-pumpkin">Subir fotos</h1>
+      <h1 className="title-glow font-display text-3xl text-blood">Subir fotos</h1>
       <UploadDropzone onUploaded={() => router.refresh()} />
     </div>
   );

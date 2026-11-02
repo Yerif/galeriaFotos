@@ -29,32 +29,35 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-background p-4">
-      <div className="w-full max-w-sm rounded-2xl border border-pumpkin/30 bg-panel p-6">
-        <h1 className="font-display text-center text-2xl text-pumpkin">
-          🎃 Admin
+    <div className="scanlines flex min-h-dvh flex-col items-center justify-center bg-background p-4">
+      <div className="w-full max-w-sm border border-blood/40 bg-panel p-6 shadow-[0_0_40px_rgba(154,17,21,0.2)]">
+        <p className="text-center text-[11px] uppercase tracking-[0.3em] text-foreground/40">
+          Acceso restringido
+        </p>
+        <h1 className="title-glow mt-1 text-center font-display text-3xl text-blood">
+          Admin
         </h1>
         {sent ? (
           <p className="mt-4 text-center text-sm text-foreground/80">
             Revisa tu correo y toca el link para entrar.
           </p>
         ) : (
-          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
+          <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
-              className="w-full rounded-lg border border-witch/50 bg-background px-4 py-3 text-base text-foreground outline-none focus:border-pumpkin"
+              className="w-full border border-ash bg-background px-4 py-3 text-base text-foreground outline-none focus:border-blood"
             />
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            {error && <p className="text-sm text-blood">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-pumpkin px-4 py-3 font-semibold text-black transition active:scale-95 disabled:opacity-50"
+              className="w-full border border-blood bg-blood/90 px-4 py-3 font-display tracking-widest text-foreground transition active:scale-95 disabled:opacity-50"
             >
-              {loading ? "Enviando..." : "Enviarme el link mágico"}
+              {loading ? "Enviando..." : "Enviarme el link"}
             </button>
           </form>
         )}

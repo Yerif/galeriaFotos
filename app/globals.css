@@ -1,55 +1,132 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0d0510;
-  --foreground: #f5ece0;
-  --color-pumpkin: #ff7518;
-  --color-pumpkin-dark: #c8530c;
-  --color-witch: #6b2fa0;
-  --color-witch-dark: #2e1a47;
-  --color-slime: #8bd450;
-  --color-panel: #17091f;
+  --background: #09070a;
+  --foreground: #e7e0d2;
+  --color-blood: #9a1115;
+  --color-blood-dark: #5c0c0f;
+  --color-ash: #3a3332;
+  --color-ash-dark: #19100f;
+  --color-acid: #6b8f3f;
+  --color-panel: #120d0d;
+  --color-static: #c9a227;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-pumpkin: var(--color-pumpkin);
-  --color-pumpkin-dark: var(--color-pumpkin-dark);
-  --color-witch: var(--color-witch);
-  --color-witch-dark: var(--color-witch-dark);
-  --color-slime: var(--color-slime);
+  --color-blood: var(--color-blood);
+  --color-blood-dark: var(--color-blood-dark);
+  --color-ash: var(--color-ash);
+  --color-ash-dark: var(--color-ash-dark);
+  --color-acid: var(--color-acid);
   --color-panel: var(--color-panel);
+  --color-static: var(--color-static);
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
 }
 
 body {
-  background: radial-gradient(circle at top, var(--color-witch-dark) 0%, var(--background) 60%);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(154, 17, 21, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 120% 80% at 50% 110%, rgba(0, 0, 0, 0.9) 0%, transparent 70%),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  position: relative;
+}
+
+/* Grano de película: textura fija sobre toda la app, sutil, estilo VHS/35mm. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Viñeta: oscurece los bordes, como un cuadro de cine viejo. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  box-shadow: inset 0 0 18vmin 2vmin rgba(0, 0, 0, 0.85);
 }
 
 .font-display {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Título tipo cartel de slasher: relieve rojo con doble sombra desfasada (cromatismo VHS). */
+.title-glow {
+  text-shadow:
+    0 0 18px rgba(154, 17, 21, 0.55),
+    2px 0 0 rgba(201, 162, 39, 0.25),
+    -2px 0 0 rgba(0, 150, 160, 0.2);
+}
+
+/* Franjas de escaneo, para paneles que quieran look de TV/VHS. */
+.scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.25) 0px,
+    rgba(0, 0, 0, 0.25) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+@keyframes flicker {
+  0%, 92%, 100% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.4;
+  }
+  95% {
+    opacity: 0.85;
+  }
+  97% {
+    opacity: 0.5;
+  }
+}
+
+.animate-flicker {
+  animation: flicker 5s infinite;
 }
 
 @keyframes float-slow {
   0%, 100% {
-    transform: translateY(0) rotate(-2deg);
+    transform: translateY(0) rotate(-1deg);
   }
   50% {
-    transform: translateY(-12px) rotate(2deg);
+    transform: translateY(-10px) rotate(1deg);
   }
 }
 
 .animate-float-slow {
-  animation: float-slow 6s ease-in-out infinite;
+  animation: float-slow 7s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-float-slow {
+  .animate-float-slow,
+  .animate-flicker {
     animation: none;
   }
 }

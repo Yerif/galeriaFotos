@@ -30,9 +30,9 @@ export function DownloadButton({
       type="button"
       onClick={handleDownload}
       disabled={disabled || downloading}
-      className={`inline-flex items-center justify-center gap-2 rounded-full bg-pumpkin px-4 py-2 text-sm font-semibold text-black transition active:scale-95 disabled:opacity-50 ${className}`}
+      className={`inline-flex items-center justify-center gap-2 border border-blood bg-blood/90 px-5 py-2 text-sm font-display tracking-widest text-foreground transition active:scale-95 disabled:opacity-50 ${className}`}
     >
-      {downloading ? "Descargando..." : "⬇️ Descargar"}
+      {downloading ? "Descargando..." : "Descargar"}
     </button>
   );
 }

@@ -92,9 +92,8 @@ export function UploadDropzone({ onUploaded }: { onUploaded: () => void }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-pumpkin/50 bg-panel px-4 py-10 text-center">
-        <span className="text-3xl">📤</span>
-        <span className="font-medium text-foreground/90">Tocar para elegir fotos</span>
+      <label className="flex cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed border-blood/50 bg-panel px-4 py-10 text-center">
+        <span className="font-display text-xl tracking-widest text-blood">Subir fotos</span>
         <span className="text-sm text-foreground/60">Puedes seleccionar varias a la vez</span>
         <input
           type="file"
@@ -113,9 +112,9 @@ export function UploadDropzone({ onUploaded }: { onUploaded: () => void }) {
               <span
                 className={
                   f.progress === "error"
-                    ? "text-red-400"
+                    ? "text-blood"
                     : f.progress === "listo"
-                    ? "text-slime"
+                    ? "text-acid"
                     : "text-foreground/60"
                 }
               >
