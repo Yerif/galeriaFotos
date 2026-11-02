@@ -83,12 +83,12 @@ o la sección de arquitectura más abajo).
   sesión, saltable), grilla justificada sin recortes, lightbox con zoom y
   cierre deslizando, y niebla de proyector en la cabecera. Solo se animan
   `transform` y `opacity`, y `prefers-reduced-motion` apaga todo el movimiento.
-- **Niebla WebGL (Three.js)**: la niebla CSS siempre está; la de WebGL entra
-  encima solo en dispositivos que pasan una compuerta (`lib/webglCapability.ts`:
-  ≥4 núcleos, sin ahorro de datos, red 4g, WebGL2, sin reduce-motion), tras
-  `requestIdleCallback` y renderizada a 0.5 de resolución. Una guardia
-  (`lib/frameGuard.ts`) la apaga si la mediana de fotogramas supera 24 ms.
-  El chunk de Three.js pesa ~240 KB gzip: si en la práctica no compensa,
-  se puede quitar `FogBackground` de `GalleryHeader` y la niebla CSS queda sola.
+- **Niebla WebGL**: la niebla CSS siempre está; la de WebGL2 (directo, sin
+  librerías: `components/shared/FogCanvas.tsx`) entra encima solo en dispositivos
+  que pasan una compuerta (`lib/webglCapability.ts`: ≥4 núcleos, sin ahorro de
+  datos, red 4g, WebGL2, sin reduce-motion), tras `requestIdleCallback` y
+  renderizada a 0.5 de resolución. Una guardia (`lib/frameGuard.ts`) la apaga si
+  la mediana de fotogramas supera 24 ms. Con Three.js costaba ~240 KB y ~420 ms
+  de bloqueo en celulares capaces; en WebGL directo el costo es prácticamente nulo.
 - **Modo demo** (`DEMO_MODE=1`, opcional `DEMO_COUNT`, `DEMO_DEADLINE_HOURS`):
   datos de muestra sin Supabase, para previsualizar y medir.

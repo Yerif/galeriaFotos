@@ -4,9 +4,9 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { disableWebGLFog, useWebGLCapability } from "@/lib/webglCapability";
 
-// El chunk de Three.js (~243 KB gzip) solo se descarga en dispositivos que pasan la compuerta
-// de capacidad y después de que el navegador quede libre: nunca compite con la carga inicial.
-const ThreeScene = dynamic(() => import("@/components/shared/ThreeScene"), { ssr: false });
+// El canvas WebGL (unos pocos KB) solo se descarga en dispositivos que pasan la compuerta de capacidad
+// y después de que el navegador quede libre: nunca compite con la carga inicial.
+const FogCanvas = dynamic(() => import("@/components/shared/FogCanvas"), { ssr: false });
 
 type IdleWindow = Window & {
   requestIdleCallback?: (cb: () => void, options?: { timeout: number }) => number;
@@ -37,7 +37,7 @@ export function FogBackground() {
   return (
     <div className="fog" aria-hidden="true" data-fog={glActive ? "webgl" : "css"} data-gl={glActive}>
       <div className="fog-css" />
-      {mountWebGL && <ThreeScene onSlow={disableWebGLFog} onReadyChange={setReady} />}
+      {mountWebGL && <FogCanvas onSlow={disableWebGLFog} onReadyChange={setReady} />}
     </div>
   );
 }
