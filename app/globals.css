@@ -57,13 +57,14 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0.9 0 0 0 -0.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Viñeta: oscurece los bordes, como un cuadro de cine viejo. Degradado radial (barato)
-   en vez de un box-shadow inset con gran desenfoque. */
+/* Viñeta de fondo: oscurece los bordes de la página, como un cuadro de cine viejo. Degradado radial
+   (barato). Va DETRÁS del contenido (z-index -1): encima de todo oscurecía el texto en las esquinas
+   y las fotos de los invitados. */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 9998;
+  z-index: -1;
   pointer-events: none;
   background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.78) 100%);
 }
@@ -255,6 +256,135 @@ body::after {
   to {
     transform: none;
   }
+}
+
+/* Contador. El estado (days | clock | final | done) lo escribe el componente en data-state. */
+.cd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cd-text {
+  color: var(--foreground);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reserva la altura de una línea antes de que el contador escriba su texto (sin saltos de layout). */
+.cd-text:empty::before {
+  content: "\00a0";
+}
+
+.cd-hero .cd-text {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.cd-compact .cd-text {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.cd-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgb(231 224 210 / 0.6);
+}
+
+.cd[data-state="days"] .cd-label-urgent,
+.cd:not([data-state="days"]) .cd-label-days {
+  display: none;
+}
+
+.cd[data-state="clock"] .cd-text,
+.cd[data-state="final"] .cd-text,
+.cd[data-state="done"] .cd-text {
+  color: var(--color-blood-bright);
+}
+
+.cd[data-state="final"] .cd-text {
+  animation: flicker 4s infinite;
+}
+
+/* Barra fija compacta: aparece al salir la cabecera grande de pantalla. Solo transform/opacity. */
+.sticky-bar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: max(0.5rem, env(safe-area-inset-top)) 1rem 0.5rem;
+  background: #09070a;
+  border-bottom: 1px solid rgb(154 17 21 / 0.4);
+  opacity: 0;
+  transform: translateY(-100%);
+  pointer-events: none;
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
+}
+
+.sticky-bar[data-stuck="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Intro tipo título de película: ~1.9 s, solo CSS (transform/opacity). Se desvanece sola. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #000;
+  animation: intro-out 450ms var(--ease-out) 1350ms both;
+}
+
+.intro-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 13vh;
+  background: #000;
+  border: 0 solid rgb(154 17 21 / 0.55);
+}
+
+.intro-bar-top {
+  top: 0;
+  border-bottom-width: 1px;
+  animation: bar-top 1800ms var(--ease-out) both;
+}
+
+.intro-bar-bottom {
+  bottom: 0;
+  border-top-width: 1px;
+  animation: bar-bottom 1800ms var(--ease-out) both;
+}
+
+@keyframes intro-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes bar-top {
+  0% { transform: translateY(-100%); }
+  22%, 72% { transform: none; }
+  100% { transform: translateY(-100%); }
+}
+
+@keyframes bar-bottom {
+  0% { transform: translateY(100%); }
+  22%, 72% { transform: none; }
+  100% { transform: translateY(100%); }
 }
 
 /* Lightbox (yet-another-react-lightbox) tematizado. Los filtros drop-shadow por defecto se quitan. */

@@ -4,20 +4,23 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { NamePrompt } from "@/components/guest/NamePrompt";
 import { PhotoGrid } from "@/components/guest/PhotoGrid";
 import { Lightbox } from "@/components/guest/Lightbox";
-import { CountdownBanner } from "@/components/guest/CountdownBanner";
+import { GalleryHeader } from "@/components/guest/GalleryHeader";
+import { IntroTitleCard } from "@/components/guest/IntroTitleCard";
 import { useGuestName } from "@/lib/useGuestName";
+import { useIntro } from "@/lib/useIntro";
 import type { PhotoMeta } from "@/lib/types";
 
 const PAGE_SIZE = 24;
 
 export function GalleryClient({
   initialPhotos,
-  daysRemaining,
+  deadlineAt,
 }: {
   initialPhotos: PhotoMeta[];
-  daysRemaining: number | null;
+  deadlineAt: string | null;
 }) {
   const { guestName, ready, saveGuestName } = useGuestName();
+  const { playing: introPlaying, finish: finishIntro } = useIntro();
   const [photos, setPhotos] = useState(initialPhotos);
   const [hasMore, setHasMore] = useState(initialPhotos.length === PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -56,15 +59,11 @@ export function GalleryClient({
 
   return (
     <div className="relative mx-auto max-w-2xl px-4 py-6">
-      {!guestName && <NamePrompt onSubmit={saveGuestName} />}
+      {introPlaying && <IntroTitleCard onDone={finishIntro} />}
+      {/* Se espera a que termine la intro para que el autofocus no abra el teclado detrás de ella. */}
+      {!guestName && !introPlaying && <NamePrompt onSubmit={saveGuestName} />}
 
-      <header className="mb-5 flex flex-col items-center gap-2 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-foreground/60">
-          La fiesta de Halloween
-        </p>
-        <h1 className="title-glow font-display text-4xl text-blood-bright">La Galería</h1>
-        <CountdownBanner daysRemaining={daysRemaining} />
-      </header>
+      <GalleryHeader deadlineAt={deadlineAt} />
 
       <PhotoGrid photos={photos} onOpen={setLightboxIndex} />
 

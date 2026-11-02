@@ -42,8 +42,10 @@ export function demoPhotoUrl(id: string) {
   return `/demo/halloween-${((n - 1) % DEMO_SVG_VARIANTS) + 1}.svg`;
 }
 
+const DEMO_DEADLINE_HOURS = Number(process.env.DEMO_DEADLINE_HOURS) || 120;
+
 export function demoDeadlineIso() {
-  return new Date(Date.now() + 5 * 86_400_000).toISOString();
+  return new Date(Date.now() + DEMO_DEADLINE_HOURS * 3_600_000).toISOString();
 }
 
 export const demoGuestNames = [

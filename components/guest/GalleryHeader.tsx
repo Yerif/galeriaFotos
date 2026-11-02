@@ -1,0 +1,36 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import { Countdown } from "@/components/guest/Countdown";
+
+export function GalleryHeader({ deadlineAt }: { deadlineAt: string | null }) {
+  const heroRef = useRef<HTMLElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+
+  // La barra fija aparece cuando la cabecera grande sale de pantalla (atributo en el DOM, sin re-render).
+  useEffect(() => {
+    const hero = heroRef.current;
+    const bar = barRef.current;
+    if (!hero || !bar) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      bar.dataset.stuck = entry.isIntersecting ? "false" : "true";
+    });
+    observer.observe(hero);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      <div ref={barRef} data-stuck="false" className="sticky-bar" aria-hidden="true">
+        <span className="title-glow font-display text-xl tracking-widest text-blood-bright">La Galería</span>
+        <Countdown deadlineAt={deadlineAt} variant="compact" />
+      </div>
+
+      <header ref={heroRef} className="mb-6 flex flex-col items-center gap-2 text-center">
+        <p className="text-xs uppercase tracking-[0.3em] text-foreground/60">La fiesta de Halloween</p>
+        <h1 className="title-glow font-display text-5xl text-blood-bright">La Galería</h1>
+        <Countdown deadlineAt={deadlineAt} variant="hero" />
+      </header>
+    </>
+  );
+}

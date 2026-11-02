@@ -4,13 +4,13 @@ import { getEventStatus } from "@/lib/event";
 import { ExpiredNotice } from "@/components/guest/ExpiredNotice";
 import { GalleryClient } from "@/components/guest/GalleryClient";
 import { LoadingScreen } from "@/components/shared/LoadingScreen";
-import { DEMO_MODE, demoPhotos } from "@/lib/demo";
+import { DEMO_MODE, demoDeadlineIso, demoPhotos } from "@/lib/demo";
 
 const PAGE_SIZE = 24;
 
 async function GalleryContent() {
   if (DEMO_MODE) {
-    return <GalleryClient initialPhotos={demoPhotos} daysRemaining={5} />;
+    return <GalleryClient initialPhotos={demoPhotos} deadlineAt={demoDeadlineIso()} />;
   }
 
   const supabase = await createClient();
@@ -25,7 +25,7 @@ async function GalleryContent() {
     return <ExpiredNotice />;
   }
 
-  const { isExpired, daysRemaining } = getEventStatus(event);
+  const { isExpired } = getEventStatus(event);
 
   if (isExpired) {
     return <ExpiredNotice />;
@@ -38,7 +38,7 @@ async function GalleryContent() {
     .order("created_at", { ascending: false })
     .limit(PAGE_SIZE);
 
-  return <GalleryClient initialPhotos={photos ?? []} daysRemaining={daysRemaining} />;
+  return <GalleryClient initialPhotos={photos ?? []} deadlineAt={event.deadline_at} />;
 }
 
 export default function GaleriaPage() {
