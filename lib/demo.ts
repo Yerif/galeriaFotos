@@ -1,6 +1,9 @@
 // Modo de preview visual, sin Supabase real. Solo para generar capturas de pantalla
-// de muestra; no se usa en producción (requiere DEMO_MODE=1 explícito).
+// de muestra y medir rendimiento; no se usa en producción (requiere DEMO_MODE=1 explícito).
 export const DEMO_MODE = process.env.DEMO_MODE === "1";
+
+const DEMO_COUNT = Math.max(1, Number(process.env.DEMO_COUNT) || 9);
+const DEMO_SVG_VARIANTS = 9;
 
 export type DemoPhoto = {
   id: string;
@@ -10,17 +13,33 @@ export type DemoPhoto = {
   created_at: string;
 };
 
-export const demoPhotos: DemoPhoto[] = Array.from({ length: 9 }).map((_, i) => ({
-  id: `demo-${i + 1}`,
-  original_filename: `halloween-${i + 1}.jpg`,
-  width: 1200,
-  height: 1200,
-  created_at: new Date(Date.now() - i * 3600_000).toISOString(),
-}));
+// Relaciones de aspecto variadas (horizontal, vertical, cuadrada) para probar la grilla justificada.
+const DEMO_DIMENSIONS: Array<[number, number]> = [
+  [1200, 800],
+  [800, 1200],
+  [1000, 1000],
+  [1200, 900],
+  [900, 1200],
+  [1600, 900],
+  [1000, 1000],
+  [1200, 800],
+  [800, 1000],
+];
+
+export const demoPhotos: DemoPhoto[] = Array.from({ length: DEMO_COUNT }).map((_, i) => {
+  const [width, height] = DEMO_DIMENSIONS[i % DEMO_DIMENSIONS.length];
+  return {
+    id: `demo-${i + 1}`,
+    original_filename: `halloween-${i + 1}.jpg`,
+    width,
+    height,
+    created_at: new Date(Date.now() - i * 3600_000).toISOString(),
+  };
+});
 
 export function demoPhotoUrl(id: string) {
   const n = Number(id.replace("demo-", "")) || 1;
-  return `/demo/halloween-${n}.svg`;
+  return `/demo/halloween-${((n - 1) % DEMO_SVG_VARIANTS) + 1}.svg`;
 }
 
 export function demoDeadlineIso() {
