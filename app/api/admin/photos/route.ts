@@ -28,7 +28,7 @@ export async function GET() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: "query_failed" }, { status: 500 });
+    return NextResponse.json({ error: "query_failed", detail: error.message }, { status: 500 });
   }
 
   const rows = await Promise.all(
@@ -71,9 +71,16 @@ export async function POST(request: NextRequest) {
 
   const supabase = createAdminClient();
 
-  const { data: event } = await supabase.from("event").select("id").limit(1).single();
+  const { data: event, error: eventError } = await supabase
+    .from("event")
+    .select("id")
+    .limit(1)
+    .single();
   if (!event) {
-    return NextResponse.json({ error: "no_event" }, { status: 500 });
+    return NextResponse.json(
+      { error: "no_event", detail: eventError?.message ?? "unknown" },
+      { status: 500 }
+    );
   }
 
   const { data: photo, error } = await supabase
@@ -92,7 +99,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: "insert_failed" }, { status: 500 });
+    return NextResponse.json({ error: "insert_failed", detail: error.message }, { status: 500 });
   }
 
   return NextResponse.json({ photo });

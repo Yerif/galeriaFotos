@@ -7,7 +7,17 @@ import { createClient } from "@/lib/supabase/client";
 type FileStatus = {
   name: string;
   progress: "comprimiendo" | "subiendo" | "listo" | "error";
+  errorDetail?: string;
 };
+
+async function readErrorDetail(res: Response, fallback: string): Promise<string> {
+  try {
+    const body = await res.json();
+    return body?.detail || body?.error || fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 async function compress(file: File, maxWidthOrHeight: number, maxSizeMB: number) {
   return imageCompression(file, {
@@ -45,7 +55,9 @@ export function UploadDropzone({ onUploaded }: { onUploaded: () => void }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ext: "jpg" }),
         });
-        if (!urlRes.ok) throw new Error("No se pudo preparar la subida");
+        if (!urlRes.ok) {
+          throw new Error(await readErrorDetail(urlRes, "No se pudo preparar la subida"));
+        }
         const { displayPath, thumbPath, displayUpload, thumbUpload } = await urlRes.json();
 
         const [displayResult, thumbResult] = await Promise.all([
@@ -57,7 +69,9 @@ export function UploadDropzone({ onUploaded }: { onUploaded: () => void }) {
             .uploadToSignedUrl(thumbPath, thumbUpload.token, thumb),
         ]);
         if (displayResult.error || thumbResult.error) {
-          throw new Error("Falló la subida al storage");
+          throw new Error(
+            displayResult.error?.message || thumbResult.error?.message || "Falló la subida al storage"
+          );
         }
 
         const dims = await getImageDimensions(display);
@@ -75,14 +89,17 @@ export function UploadDropzone({ onUploaded }: { onUploaded: () => void }) {
             height: dims?.height,
           }),
         });
-        if (!confirmRes.ok) throw new Error("No se pudo guardar la foto");
+        if (!confirmRes.ok) {
+          throw new Error(await readErrorDetail(confirmRes, "No se pudo guardar la foto"));
+        }
 
         setFiles((prev) =>
           prev.map((f, idx) => (idx === i ? { ...f, progress: "listo" } : f))
         );
-      } catch {
+      } catch (err) {
+        const errorDetail = err instanceof Error ? err.message : "Error desconocido";
         setFiles((prev) =>
-          prev.map((f, idx) => (idx === i ? { ...f, progress: "error" } : f))
+          prev.map((f, idx) => (idx === i ? { ...f, progress: "error", errorDetail } : f))
         );
       }
     }
@@ -107,19 +124,24 @@ export function UploadDropzone({ onUploaded }: { onUploaded: () => void }) {
       {files.length > 0 && (
         <ul className="flex flex-col gap-1 text-sm">
           {files.map((f) => (
-            <li key={f.name} className="flex items-center justify-between gap-2">
-              <span className="truncate">{f.name}</span>
-              <span
-                className={
-                  f.progress === "error"
-                    ? "text-blood"
-                    : f.progress === "listo"
-                    ? "text-acid"
-                    : "text-foreground/60"
-                }
-              >
-                {f.progress}
-              </span>
+            <li key={f.name} className="flex flex-col gap-0.5">
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate">{f.name}</span>
+                <span
+                  className={
+                    f.progress === "error"
+                      ? "text-blood"
+                      : f.progress === "listo"
+                      ? "text-acid"
+                      : "text-foreground/60"
+                  }
+                >
+                  {f.progress}
+                </span>
+              </div>
+              {f.errorDetail && (
+                <span className="truncate text-xs text-blood/70">{f.errorDetail}</span>
+              )}
             </li>
           ))}
         </ul>

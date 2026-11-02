@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
   ]);
 
   if (displayUpload.error || thumbUpload.error) {
-    return NextResponse.json({ error: "signing_failed" }, { status: 500 });
+    const detail = displayUpload.error?.message ?? thumbUpload.error?.message ?? "unknown";
+    return NextResponse.json({ error: "signing_failed", detail }, { status: 500 });
   }
 
   return NextResponse.json({
