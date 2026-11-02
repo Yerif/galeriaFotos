@@ -242,17 +242,17 @@ body::after {
   flex-grow: calc(var(--w) / var(--h) * 100);
   flex-basis: calc(var(--w) / var(--h) * var(--row-h));
   aspect-ratio: var(--w) / var(--h);
-  /* aspect-ratio mantiene la altura aunque el contenido esté fuera de pantalla. */
-  content-visibility: auto;
-  contain-intrinsic-size: auto var(--row-h);
+  /* NO usar content-visibility: auto aquí. Con este layout flex hace que las filas se reempaqueten
+     en cada fotograma (las celdas vibran en reposo y el alto del documento cambia). Medido: 22 de 24
+     celdas vibraban con él y 0 sin él. */
 }
 
 .jitem > button {
-  transition: transform var(--dur-fast) var(--ease-out);
+  transition: scale var(--dur-fast) var(--ease-out);
 }
 
 .jitem > button:active {
-  transform: scale(0.97);
+  scale: 0.97;
 }
 
 @media (min-width: 640px) {
@@ -272,12 +272,18 @@ body::after {
   animation-delay: calc(var(--i, 0) * 40ms);
 }
 
-/* Entrada por scroll (solo compositor). Mejora progresiva: sin soporte no pasa nada. */
+/* Entrada por scroll (solo compositor). Mejora progresiva: sin soporte no pasa nada.
+   El sujeto del timeline (.jitem) queda quieto y se anima su hijo, para que el progreso no dependa
+   del borde del elemento que se está moviendo. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .jitem {
+      view-timeline-name: --jitem;
+    }
+
+    .jitem > button {
       animation: jitem-in linear both;
-      animation-timeline: view();
+      animation-timeline: --jitem;
       animation-range: entry 0% entry 40%;
     }
   }

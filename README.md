@@ -46,8 +46,18 @@ o la sección de arquitectura más abajo).
   (guardado en `localStorage`) antes de ver la galería. El grid usa lazy
   loading + paginado, y el lightbox (swipe en mobile) carga la foto en
   tamaño completo solo al abrirla.
-- **Descarga**: proxy server-side (`/api/download/[photoId]`) que fuerza
-  "Guardar como" con el nombre original y registra quién descargó qué.
+- **Imágenes**: se sirven desde el mismo origen por `/api/photos/[id]/img`
+  (`?v=thumb|display`) con `Cache-Control` acotado al plazo de descarga
+  (máx. 24 h y nunca más allá del vencimiento). El navegador y el CDN de
+  Vercel las cachean: ~1 descarga de Supabase por foto en vez de una por
+  invitado. Una foto borrada por el admin puede seguir visible en caché
+  hasta 24 h.
+- **Descarga**: en móviles con Web Share de archivos se abre la hoja de
+  compartir para guardar directo en Fotos (`lib/shareOrDownload.ts`); si no
+  hay soporte, o iOS la bloquea, se usa `/api/download/[photoId]` (descarga
+  de archivo). Cada descarga queda registrada por nombre: la de archivo la
+  registra el servidor y la de compartir, `POST /api/downloads`, solo si
+  el usuario completó la acción (cancelar no cuenta).
 - **Admin**: login simplificado — se ingresa el email y, si coincide con
   `ADMIN_EMAIL`, el servidor entrega una cookie firmada (HMAC con
   `ADMIN_SESSION_SECRET`, ver `lib/adminToken.ts`) que habilita `/admin/*`.
@@ -57,14 +67,26 @@ o la sección de arquitectura más abajo).
   cambiar el plazo) usan la service role key en el servidor, así que no
   dependen de Supabase Auth.
 - **Plazo de 7 días**: un trigger de Postgres fija `event.deadline_at` a
-  `now() + 7 días` cuando se sube la primera foto. El servidor deja de
-  emitir signed URLs y de aceptar descargas pasada esa fecha — no hace
-  falta ningún cron job.
+  `now() + 7 días` cuando se sube la primera foto. Pasada esa fecha
+  el servidor responde 403 en las imágenes y rechaza descargas, y las
+  copias en caché caducan a más tardar en el vencimiento — no hace falta
+  ningún cron job. El contador de la cabecera muestra los días y, en las
+  últimas 24 h, un reloj HH:MM:SS.
 - **Free tier**: las fotos se comprimen/redimensionan en el navegador antes
   de subirse (variantes `display` ~1600px y `thumb` ~500px), evitando
   depender de Supabase Image Transformations (función de pago) y
   manteniendo el consumo de Storage/egress muy por debajo de los límites
   gratuitos de Supabase y Vercel.
-- **Decoración**: fondo con Three.js (pocas partículas, dpr limitado, se
-  pausa fuera de pantalla) con fallback automático a CSS si el dispositivo
-  no soporta WebGL o el usuario activó "reducir movimiento".
+- **Experiencia visual**: intro tipo título de película (solo CSS, una vez por
+  sesión, saltable), grilla justificada sin recortes, lightbox con zoom y
+  cierre deslizando, y niebla de proyector en la cabecera. Solo se animan
+  `transform` y `opacity`, y `prefers-reduced-motion` apaga todo el movimiento.
+- **Niebla WebGL (Three.js)**: la niebla CSS siempre está; la de WebGL entra
+  encima solo en dispositivos que pasan una compuerta (`lib/webglCapability.ts`:
+  ≥4 núcleos, sin ahorro de datos, red 4g, WebGL2, sin reduce-motion), tras
+  `requestIdleCallback` y renderizada a 0.5 de resolución. Una guardia
+  (`lib/frameGuard.ts`) la apaga si la mediana de fotogramas supera 24 ms.
+  El chunk de Three.js pesa ~240 KB gzip: si en la práctica no compensa,
+  se puede quitar `FogBackground` de `GalleryHeader` y la niebla CSS queda sola.
+- **Modo demo** (`DEMO_MODE=1`, opcional `DEMO_COUNT`, `DEMO_DEADLINE_HOURS`):
+  datos de muestra sin Supabase, para previsualizar y medir.

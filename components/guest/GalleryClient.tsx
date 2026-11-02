@@ -58,7 +58,7 @@ export function GalleryClient({
   if (!ready) return null;
 
   return (
-    <div className="relative mx-auto max-w-2xl px-4 py-6">
+    <div className="relative mx-auto w-full max-w-2xl px-4 py-6">
       {introPlaying && <IntroTitleCard onDone={finishIntro} />}
       {/* Se espera a que termine la intro para que el autofocus no abra el teclado detrás de ella. */}
       {!guestName && !introPlaying && <NamePrompt onSubmit={saveGuestName} />}
