@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Countdown } from "@/components/guest/Countdown";
+import { BloodTitle } from "@/components/shared/BloodTitle";
 import { FogBackground } from "@/components/shared/FogBackground";
 
 export function GalleryHeader({ deadlineAt }: { deadlineAt: string | null }) {
@@ -29,9 +30,9 @@ export function GalleryHeader({ deadlineAt }: { deadlineAt: string | null }) {
 
       <header ref={heroRef} className="relative mb-6 text-center">
         <FogBackground />
-        <div className="relative z-10 flex flex-col items-center gap-2">
+        <div className="relative z-10 flex flex-col items-center gap-2 pb-6">
           <p className="text-xs uppercase tracking-[0.3em] text-foreground/60">Fotos de la fiesta</p>
-          <h1 className="title-glow whitespace-nowrap font-display text-4xl text-blood-bright min-[380px]:text-5xl">Halloween 2026</h1>
+          <h1 className="title-glow mb-5 whitespace-nowrap font-display text-4xl text-blood-bright min-[380px]:text-5xl"><BloodTitle>Halloween 2026</BloodTitle></h1>
           <Countdown deadlineAt={deadlineAt} variant="hero" />
         </div>
       </header>

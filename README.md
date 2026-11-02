@@ -13,9 +13,11 @@ o la sección de arquitectura más abajo).
 ## Setup
 
 1. Crear un proyecto en [Supabase](https://supabase.com).
-2. Abrir el SQL editor del proyecto y correr `supabase/migrations/0001_init.sql`,
-   reemplazando `ADMIN_EMAIL_PLACEHOLDER` por tu email de administrador en las
-   4 ocurrencias del archivo.
+2. Abrir el SQL editor del proyecto y correr, **en este orden**:
+   1. `supabase/migrations/0001_init.sql`, reemplazando `ADMIN_EMAIL_PLACEHOLDER`
+      por tu email de administrador en las 4 ocurrencias del archivo.
+   2. `supabase/migrations/0002_photo_order.sql` (orden de fotos definido por el admin).
+      Hay que correrlo **antes de desplegar** la versión que usa la columna `position`.
 3. Copiar `.env.local.example` a `.env.local` y completar:
    - `NEXT_PUBLIC_SUPABASE_URL` (Project Settings → Data API → Project URL, **sin** `/rest/v1/` al final).
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Project Settings → Data API → `anon`/`publishable` key).

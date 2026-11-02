@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { BloodTitle } from "@/components/shared/BloodTitle";
 
 const DURATION_MS = 1900;
 
@@ -26,7 +27,7 @@ export function IntroTitleCard({ onDone }: { onDone: () => void }) {
         className="title-glow flicker-in mt-2 whitespace-nowrap font-display text-5xl text-blood-bright"
         style={{ animationDelay: "200ms" }}
       >
-        Halloween 2026
+        <BloodTitle>Halloween 2026</BloodTitle>
       </h1>
       <p
         className="reveal mt-3 text-sm uppercase tracking-[0.3em] text-foreground/80"

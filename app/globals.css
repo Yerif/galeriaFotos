@@ -348,6 +348,161 @@ body::after {
   }
 }
 
+/* Sangre escurriendo del título. Cada goteo: un hilo que crece (scaleY desde arriba), una gota en la punta
+   y una gota que se desprende y cae. Todo con transform/opacity. Con reduce-motion queda el estado final
+   (goteos cortos y quietos). */
+.blood-title {
+  position: relative;
+  display: inline-block;
+}
+
+.blood-drips {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.drip {
+  position: absolute;
+  top: 82%;
+  width: var(--w);
+  height: 0;
+  animation-name: drip-cycle;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.drip-stem,
+.drip-bulb,
+.drip-fall {
+  position: absolute;
+  display: block;
+  text-decoration: none;
+  background: linear-gradient(to bottom, var(--color-blood-bright), var(--color-blood) 75%);
+  animation: inherit;
+}
+
+.drip-stem {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: var(--len);
+  border-radius: 0 0 2px 2px;
+  transform-origin: top;
+  animation-name: drip-stem;
+  animation-timing-function: ease-in-out;
+}
+
+.drip-bulb,
+.drip-fall {
+  left: 50%;
+  width: calc(var(--w) * 1.9);
+  height: calc(var(--w) * 1.9);
+  margin-left: calc(var(--w) * -0.95);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--color-blood-bright), var(--color-blood) 70%);
+}
+
+.drip-bulb {
+  top: 0;
+  /* Estado base = gota en la punta del hilo: es lo que se ve con reduce-motion (sin animación). */
+  transform: translateY(calc(var(--len) - var(--w) * 0.4));
+  animation-name: drip-bulb;
+  animation-timing-function: ease-in-out;
+}
+
+.drip-fall {
+  top: 0;
+  opacity: 0;
+  animation-name: drip-fall;
+  animation-timing-function: ease-in;
+}
+
+@keyframes drip-cycle {
+  from { opacity: 1; }
+  to { opacity: 1; }
+}
+
+@keyframes drip-stem {
+  0% { transform: scaleY(0.22); }
+  55% { transform: scaleY(1); }
+  86% { transform: scaleY(1); }
+  100% { transform: scaleY(0.22); }
+}
+
+@keyframes drip-bulb {
+  0% { transform: translateY(calc(var(--len) * 0.22 - var(--w) * 0.4)); opacity: 1; }
+  55% { transform: translateY(calc(var(--len) - var(--w) * 0.4)); opacity: 1; }
+  86% { transform: translateY(calc(var(--len) - var(--w) * 0.4)); opacity: 1; }
+  88% { opacity: 0; }
+  89% { transform: translateY(calc(var(--len) * 0.22 - var(--w) * 0.4)); opacity: 0; }
+  100% { transform: translateY(calc(var(--len) * 0.22 - var(--w) * 0.4)); opacity: 1; }
+}
+
+@keyframes drip-fall {
+  0%, 85% { transform: translateY(calc(var(--len) - var(--w) * 0.4)); opacity: 0; }
+  87% { transform: translateY(calc(var(--len) - var(--w) * 0.4)); opacity: 1; }
+  100% { transform: translateY(calc(var(--len) + 52px)); opacity: 0; }
+}
+
+/* Fondo vivo de la galería (detrás del contenido). Solo transform/opacity. */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ambient-mist {
+  position: absolute;
+  width: 90vmax;
+  height: 90vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(154 17 21 / 0.2), transparent 62%);
+  will-change: transform;
+}
+
+.ambient-mist-a {
+  left: -35vmax;
+  top: -25vmax;
+  animation: mist-a 48s ease-in-out infinite alternate;
+}
+
+.ambient-mist-b {
+  right: -40vmax;
+  bottom: -35vmax;
+  animation: mist-b 62s ease-in-out infinite alternate;
+}
+
+@keyframes mist-a {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(22vmax, 16vmax, 0) scale(1.18); }
+}
+
+@keyframes mist-b {
+  from { transform: translate3d(0, 0, 0) scale(1.1); }
+  to { transform: translate3d(-20vmax, -14vmax, 0) scale(0.92); }
+}
+
+.ambient-mote {
+  position: absolute;
+  bottom: -12px;
+  border-radius: 50%;
+  background: var(--color-blood-bright);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: mote-rise linear infinite;
+}
+
+@keyframes mote-rise {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  10% { opacity: 0.55; }
+  50% { transform: translate3d(var(--sway), -55vh, 0); }
+  85% { opacity: 0.3; }
+  100% { transform: translate3d(calc(var(--sway) * -0.6), -112vh, 0); opacity: 0; }
+}
+
 /* Contador. El estado (days | clock | final | done) lo escribe el componente en data-state. */
 .cd {
   display: flex;
@@ -368,12 +523,12 @@ body::after {
 }
 
 .cd-hero .cd-text {
-  font-size: 4rem;
+  font-size: 1.75rem;
   line-height: 1;
 }
 
 .cd-compact .cd-text {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   line-height: 1;
 }
 

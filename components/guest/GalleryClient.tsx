@@ -6,6 +6,7 @@ import { Lightbox } from "@/components/guest/Lightbox";
 import { GalleryHeader } from "@/components/guest/GalleryHeader";
 import { GuestIdentityProvider } from "@/components/guest/GuestIdentity";
 import { IntroTitleCard } from "@/components/guest/IntroTitleCard";
+import { AmbientBackground } from "@/components/shared/AmbientBackground";
 import { useIntro } from "@/lib/useIntro";
 import type { PhotoMeta } from "@/lib/types";
 
@@ -70,6 +71,7 @@ export function GalleryClient({
   return (
     <GuestIdentityProvider>
       <div className="relative mx-auto w-full max-w-2xl px-4 py-6">
+        <AmbientBackground />
         {introPlaying && <IntroTitleCard onDone={finishIntro} />}
 
         <GalleryHeader deadlineAt={deadlineAt} />
