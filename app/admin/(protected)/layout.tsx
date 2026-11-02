@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
 import { DEMO_MODE } from "@/lib/demo";
+import { LogoutButton } from "@/components/admin/LogoutButton";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   if (!DEMO_MODE) {
@@ -21,6 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <Link href="/admin/photos" className="shrink-0 text-foreground/70">Fotos</Link>
         <Link href="/admin/stats" className="shrink-0 text-foreground/70">Descargas</Link>
         <Link href="/admin/settings" className="shrink-0 text-foreground/70">Ajustes</Link>
+        {!DEMO_MODE && <LogoutButton />}
       </nav>
       <main className="mx-auto max-w-2xl px-4 py-6">{children}</main>
     </div>

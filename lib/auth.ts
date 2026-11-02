@@ -1,17 +1,18 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+import { ADMIN_COOKIE_NAME, verifyAdminToken } from "@/lib/adminToken";
 
 export async function getAdminSession() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!secret || !adminEmail) return null;
 
-  if (error || !data.user) {
-    return null;
-  }
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+  if (!token) return null;
 
-  if (data.user.email !== process.env.ADMIN_EMAIL) {
-    return null;
-  }
+  const email = await verifyAdminToken(token, secret);
+  if (!email || email.toLowerCase() !== adminEmail.toLowerCase()) return null;
 
-  return data.user;
+  return { email };
 }

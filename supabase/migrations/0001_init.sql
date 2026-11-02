@@ -1,5 +1,11 @@
 -- Galería de fotos Halloween — esquema inicial
 -- Reemplazar 'ADMIN_EMAIL_PLACEHOLDER' por el email real del admin antes de correr esta migración.
+--
+-- Nota: la app NO usa Supabase Auth para el admin (login simplificado por cookie
+-- propia, ver lib/adminToken.ts), así que auth.jwt()->>'email' nunca va a matchear
+-- estas policies de "admin". Quedan igual como defensa en profundidad: bloquean
+-- cualquier escritura desde el cliente anon. Las operaciones de admin reales pasan
+-- por la service role key en el servidor, que bypassa RLS.
 
 create extension if not exists "pgcrypto";
 

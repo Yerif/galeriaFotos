@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -14,18 +12,21 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/admin` },
+    const res = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
     });
 
-    setLoading(false);
-    if (authError) {
-      setError(authError.message);
+    if (!res.ok) {
+      setLoading(false);
+      setError("Ese correo no tiene acceso.");
       return;
     }
-    setSent(true);
+
+    // Recarga completa para que el proxy (middleware) vea la cookie recién seteada.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.href = "/admin";
   }
 
   return (
@@ -37,30 +38,25 @@ export default function AdminLoginPage() {
         <h1 className="title-glow mt-1 text-center font-display text-3xl text-blood">
           Admin
         </h1>
-        {sent ? (
-          <p className="mt-4 text-center text-sm text-foreground/80">
-            Revisa tu correo y toca el link para entrar.
-          </p>
-        ) : (
-          <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com"
-              className="w-full border border-ash bg-background px-4 py-3 text-base text-foreground outline-none focus:border-blood"
-            />
-            {error && <p className="text-sm text-blood">{error}</p>}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full border border-blood bg-blood/90 px-4 py-3 font-display tracking-widest text-foreground transition active:scale-95 disabled:opacity-50"
-            >
-              {loading ? "Enviando..." : "Enviarme el link"}
-            </button>
-          </form>
-        )}
+        <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
+          <input
+            type="email"
+            autoFocus
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="tu@email.com"
+            className="w-full border border-ash bg-background px-4 py-3 text-base text-foreground outline-none focus:border-blood"
+          />
+          {error && <p className="text-sm text-blood">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full border border-blood bg-blood/90 px-4 py-3 font-display tracking-widest text-foreground transition active:scale-95 disabled:opacity-50"
+          >
+            {loading ? "Entrando..." : "Entrar"}
+          </button>
+        </form>
       </div>
     </div>
   );

@@ -16,27 +16,28 @@ o la sección de arquitectura más abajo).
 2. Abrir el SQL editor del proyecto y correr `supabase/migrations/0001_init.sql`,
    reemplazando `ADMIN_EMAIL_PLACEHOLDER` por tu email de administrador en las
    4 ocurrencias del archivo.
-3. En Authentication → Providers, confirmar que el login por Email (Magic Link)
-   esté habilitado.
-4. Copiar `.env.local.example` a `.env.local` y completar:
-   - `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Project Settings → API).
-   - `SUPABASE_SERVICE_ROLE_KEY` (Project Settings → API → service_role — **nunca** se expone al cliente).
+3. Copiar `.env.local.example` a `.env.local` y completar:
+   - `NEXT_PUBLIC_SUPABASE_URL` (Project Settings → Data API → Project URL, **sin** `/rest/v1/` al final).
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Project Settings → Data API → `anon`/`publishable` key).
+   - `SUPABASE_SERVICE_ROLE_KEY` (Project Settings → Data API → `service_role`/`secret` key — **nunca** se expone al cliente).
    - `ADMIN_EMAIL` con el mismo email que usaste en el paso 2.
-5. Instalar dependencias y correr en local:
+   - `ADMIN_SESSION_SECRET`: cualquier cadena larga y aleatoria, por ejemplo generada con `openssl rand -hex 32`.
+4. Instalar dependencias y correr en local:
 
    ```bash
    npm install
    npm run dev
    ```
 
-6. Abrir `http://localhost:3000` (redirige a `/galeria`, la vista de invitados)
+5. Abrir `http://localhost:3000` (redirige a `/galeria`, la vista de invitados)
    y `http://localhost:3000/admin/login` para entrar como administrador.
 
 ## Deploy en Vercel
 
 1. Conectar el repo en [Vercel](https://vercel.com/new).
-2. Agregar las mismas 4 variables de entorno del paso 4 anterior en
-   Project Settings → Environment Variables.
+2. Agregar las mismas 5 variables de entorno del paso 3 anterior en
+   Project Settings → Environment Variables, y hacer un deploy nuevo
+   (agregar variables no redeploya solo).
 3. Deploy. El link `/galeria` es el que se comparte con los invitados.
 
 ## Arquitectura (resumen)
@@ -47,9 +48,14 @@ o la sección de arquitectura más abajo).
   tamaño completo solo al abrirla.
 - **Descarga**: proxy server-side (`/api/download/[photoId]`) que fuerza
   "Guardar como" con el nombre original y registra quién descargó qué.
-- **Admin**: login por Magic Link de Supabase, restringido a `ADMIN_EMAIL`
-  (verificado en `proxy.ts` y en las políticas RLS). Sube fotos, las borra,
-  ve estadísticas de descargas y puede ajustar la fecha límite.
+- **Admin**: login simplificado — se ingresa el email y, si coincide con
+  `ADMIN_EMAIL`, el servidor entrega una cookie firmada (HMAC con
+  `ADMIN_SESSION_SECRET`, ver `lib/adminToken.ts`) que habilita `/admin/*`.
+  No hay contraseña ni verificación por correo: es un candado simple
+  pensado para una sola persona administradora en una galería privada,
+  no para datos sensibles. Las operaciones de escritura (subir, borrar,
+  cambiar el plazo) usan la service role key en el servidor, así que no
+  dependen de Supabase Auth.
 - **Plazo de 7 días**: un trigger de Postgres fija `event.deadline_at` a
   `now() + 7 días` cuando se sube la primera foto. El servidor deja de
   emitir signed URLs y de aceptar descargas pasada esa fecha — no hace
