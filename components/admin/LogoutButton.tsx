@@ -12,7 +12,7 @@ export function LogoutButton() {
     <button
       type="button"
       onClick={handleLogout}
-      className="ml-auto shrink-0 text-foreground/50"
+      className="ml-auto shrink-0 text-foreground/60"
     >
       Salir
     </button>

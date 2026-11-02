@@ -13,7 +13,7 @@ export function CountdownBanner({ daysRemaining }: { daysRemaining: number | nul
     <div
       className={`border px-4 py-2 text-center text-xs uppercase tracking-widest ${
         urgent
-          ? "animate-flicker border-blood bg-blood/20 text-blood"
+          ? "animate-flicker border-blood bg-blood/20 text-blood-bright"
           : "border-ash text-foreground/70"
       }`}
     >

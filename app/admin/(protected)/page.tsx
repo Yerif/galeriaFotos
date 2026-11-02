@@ -40,12 +40,12 @@ function AdminDashboardView({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="title-glow font-display text-3xl text-blood">Dashboard</h1>
+      <h1 className="title-glow font-display text-3xl text-blood-bright">Dashboard</h1>
 
       <div className="border border-ash bg-panel p-4">
         {status ? (
           status.isExpired ? (
-            <p className="text-blood">La galería ya venció.</p>
+            <p className="text-blood-bright">La galería ya venció.</p>
           ) : status.daysRemaining === null ? (
             <p className="text-foreground/70">
               Aún no hay fecha límite — se fijará con la primera foto que subas.
@@ -62,11 +62,11 @@ function AdminDashboardView({
 
       <div className="grid grid-cols-2 gap-3">
         <div className="border border-ash bg-panel p-4 text-center">
-          <p className="font-display text-3xl text-blood">{photoCount ?? 0}</p>
+          <p className="font-display text-3xl text-blood-bright">{photoCount ?? 0}</p>
           <p className="text-xs uppercase tracking-widest text-foreground/60">Fotos subidas</p>
         </div>
         <div className="border border-ash bg-panel p-4 text-center">
-          <p className="font-display text-3xl text-blood">{downloadCount ?? 0}</p>
+          <p className="font-display text-3xl text-blood-bright">{downloadCount ?? 0}</p>
           <p className="text-xs uppercase tracking-widest text-foreground/60">Descargas</p>
         </div>
       </div>

@@ -36,10 +36,10 @@ export default function AdminLoginPage() {
   return (
     <div className="scanlines flex min-h-dvh flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm border border-blood/40 bg-panel p-6 shadow-[0_0_40px_rgba(154,17,21,0.2)]">
-        <p className="text-center text-[11px] uppercase tracking-[0.3em] text-foreground/40">
+        <p className="text-center text-xs uppercase tracking-[0.3em] text-foreground/60">
           Acceso restringido
         </p>
-        <h1 className="title-glow mt-1 text-center font-display text-3xl text-blood">
+        <h1 className="title-glow mt-1 text-center font-display text-3xl text-blood-bright">
           Admin
         </h1>
         <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-3">
@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
             placeholder="tu@email.com"
             className="w-full border border-ash bg-background px-4 py-3 text-base text-foreground outline-none focus:border-blood"
           />
-          {error && <p className="text-sm text-blood">{error}</p>}
+          {error && <p className="text-sm text-blood-bright">{error}</p>}
           <button
             type="submit"
             disabled={loading}

@@ -10,9 +10,18 @@
   --color-acid: #6b8f3f;
   --color-panel: #120d0d;
   --color-static: #c9a227;
+  /* Rojo para TEXTO e íconos pequeños (≥4.5:1 sobre fondo y panel). `blood` queda para rellenos, bordes y glow. */
+  --color-blood-bright: #e5484d;
+
+  /* Lenguaje de movimiento común. Solo se animan transform y opacity. */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
 }
 
 @theme inline {
+  --color-blood-bright: var(--color-blood-bright);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-blood: var(--color-blood);
@@ -125,9 +134,72 @@ body::after {
   animation: float-slow 7s ease-in-out infinite;
 }
 
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Parpadeo de proyector al aparecer. Solo opacity. */
+@keyframes flicker-in {
+  0% { opacity: 0; }
+  10% { opacity: 0.9; }
+  16% { opacity: 0.2; }
+  28% { opacity: 1; }
+  36% { opacity: 0.5; }
+  48%, 100% { opacity: 1; }
+}
+
+/* Sello tipo "GUARDADA": entra grande y rota, y se asienta. */
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) rotate(-8deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.96) rotate(-8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+/* --i: índice para escalonar (se limita en el componente). */
+.reveal {
+  animation: reveal-up var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+.flicker-in {
+  animation: flicker-in 700ms linear both;
+}
+
+.stamp {
+  animation: stamp var(--dur-base) var(--ease-out) both;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-blood-bright);
+  outline-offset: 2px;
+}
+
+/* Un único interruptor para todo el movimiento. Con duración casi nula los
+   estados finales se aplican igual, así nada queda oculto. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-float-slow,
-  .animate-flicker {
-    animation: none;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

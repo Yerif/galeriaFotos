@@ -6,9 +6,9 @@ export function LoadingScreen({ label = "Cargando..." }: { label?: string }) {
     <div className="relative flex min-h-dvh flex-col items-center justify-center gap-4 bg-background">
       <SceneBackground />
       <div className="relative z-10 flex flex-col items-center gap-4 text-center">
-        <span className="title-glow font-display text-4xl text-blood">La Galería</span>
+        <span className="title-glow font-display text-4xl text-blood-bright">La Galería</span>
         <Spinner />
-        <p className="text-xs uppercase tracking-widest text-foreground/50">{label}</p>
+        <p className="text-xs uppercase tracking-widest text-foreground/60">{label}</p>
       </div>
     </div>
   );

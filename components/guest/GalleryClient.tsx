@@ -59,17 +59,17 @@ export function GalleryClient({
       {!guestName && <NamePrompt onSubmit={saveGuestName} />}
 
       <header className="mb-5 flex flex-col items-center gap-2 text-center">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-foreground/40">
+        <p className="text-xs uppercase tracking-[0.3em] text-foreground/60">
           La fiesta de Halloween
         </p>
-        <h1 className="title-glow font-display text-4xl text-blood">La Galería</h1>
+        <h1 className="title-glow font-display text-4xl text-blood-bright">La Galería</h1>
         <CountdownBanner daysRemaining={daysRemaining} />
       </header>
 
       <PhotoGrid photos={photos} onOpen={setLightboxIndex} />
 
       {photos.length === 0 && (
-        <p className="mt-10 text-center text-sm uppercase tracking-widest text-foreground/50">
+        <p className="mt-10 text-center text-sm uppercase tracking-widest text-foreground/60">
           Todavía no hay fotos. Vuelve pronto.
         </p>
       )}

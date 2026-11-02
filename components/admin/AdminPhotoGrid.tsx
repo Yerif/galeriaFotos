@@ -47,7 +47,7 @@ export function AdminPhotoGrid() {
           <button
             type="button"
             onClick={() => handleDelete(row.id)}
-            className="absolute right-1 top-1 border border-blood/60 bg-black/80 px-2 py-0.5 text-[10px] uppercase tracking-widest text-blood"
+            className="absolute right-1 top-1 border border-blood/60 bg-black/80 px-2 py-0.5 text-xs uppercase tracking-widest text-blood-bright"
           >
             Borrar
           </button>
