@@ -4,10 +4,15 @@ import { getEventStatus } from "@/lib/event";
 import { ExpiredNotice } from "@/components/guest/ExpiredNotice";
 import { GalleryClient } from "@/components/guest/GalleryClient";
 import { LoadingScreen } from "@/components/shared/LoadingScreen";
+import { DEMO_MODE, demoPhotos } from "@/lib/demo";
 
 const PAGE_SIZE = 24;
 
 async function GalleryContent() {
+  if (DEMO_MODE) {
+    return <GalleryClient initialPhotos={demoPhotos} daysRemaining={5} />;
+  }
+
   const supabase = await createClient();
 
   const { data: event } = await supabase

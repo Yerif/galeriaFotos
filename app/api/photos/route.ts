@@ -1,9 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE } from "@/lib/demo";
 
 const PAGE_SIZE = 24;
 
 export async function GET(request: NextRequest) {
+  if (DEMO_MODE) {
+    return NextResponse.json({ photos: [] });
+  }
+
   const supabase = await createClient();
   const cursor = request.nextUrl.searchParams.get("cursor");
 

@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
+import { DEMO_MODE } from "@/lib/demo";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const admin = await getAdminSession();
-
-  if (!admin) {
-    redirect("/admin/login");
+  if (!DEMO_MODE) {
+    const admin = await getAdminSession();
+    if (!admin) {
+      redirect("/admin/login");
+    }
   }
 
   return (

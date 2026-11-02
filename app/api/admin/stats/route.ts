@@ -1,8 +1,24 @@
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { DEMO_MODE, demoGuestNames, demoPhotos, demoPhotoUrl } from "@/lib/demo";
 
 export async function GET() {
+  if (DEMO_MODE) {
+    const rows = demoGuestNames.map((name, i) => {
+      const photo = demoPhotos[i % demoPhotos.length];
+      return {
+        id: `demo-download-${i}`,
+        guestName: name,
+        downloadedAt: new Date(Date.now() - i * 1800_000).toISOString(),
+        photoId: photo.id,
+        originalFilename: photo.original_filename,
+        thumbnailUrl: demoPhotoUrl(photo.id),
+      };
+    });
+    return NextResponse.json({ rows });
+  }
+
   const admin = await getAdminSession();
   if (!admin) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });

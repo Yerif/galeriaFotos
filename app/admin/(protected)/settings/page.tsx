@@ -1,9 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
 import { DeadlineEditor } from "@/components/admin/DeadlineEditor";
+import { DEMO_MODE, demoDeadlineIso } from "@/lib/demo";
 
 export default async function AdminSettingsPage() {
-  const supabase = await createClient();
-  const { data: event } = await supabase.from("event").select("*").limit(1).single();
+  const event = DEMO_MODE
+    ? { deadline_at: demoDeadlineIso() }
+    : await (async () => {
+        const supabase = await createClient();
+        const { data } = await supabase.from("event").select("*").limit(1).single();
+        return data;
+      })();
 
   return (
     <div className="flex flex-col gap-4">

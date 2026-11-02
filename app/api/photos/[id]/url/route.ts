@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getEventStatus } from "@/lib/event";
+import { DEMO_MODE, demoPhotoUrl } from "@/lib/demo";
 
 const SIGNED_URL_TTL_SECONDS = 600;
 
@@ -11,6 +12,10 @@ export async function GET(
 ) {
   const { id } = await params;
   const variant = request.nextUrl.searchParams.get("variant") === "display" ? "display" : "thumb";
+
+  if (DEMO_MODE) {
+    return NextResponse.json({ url: demoPhotoUrl(id) });
+  }
 
   const supabase = await createClient();
 

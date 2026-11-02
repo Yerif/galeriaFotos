@@ -1,8 +1,13 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getEventStatus } from "@/lib/event";
+import { DEMO_MODE } from "@/lib/demo";
 
 export default async function AdminDashboardPage() {
+  if (DEMO_MODE) {
+    return <AdminDashboardView photoCount={9} downloadCount={14} status={{ isExpired: false, daysRemaining: 5 }} />;
+  }
+
   const supabase = await createClient();
 
   const { data: event } = await supabase.from("event").select("*").limit(1).single();
@@ -15,6 +20,24 @@ export default async function AdminDashboardPage() {
 
   const status = event ? getEventStatus(event) : null;
 
+  return (
+    <AdminDashboardView
+      photoCount={photoCount ?? 0}
+      downloadCount={downloadCount ?? 0}
+      status={status}
+    />
+  );
+}
+
+function AdminDashboardView({
+  photoCount,
+  downloadCount,
+  status,
+}: {
+  photoCount: number;
+  downloadCount: number;
+  status: { isExpired: boolean; daysRemaining: number | null } | null;
+}) {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="font-display text-2xl text-pumpkin">Dashboard</h1>

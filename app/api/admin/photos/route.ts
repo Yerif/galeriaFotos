@@ -1,8 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getAdminSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { DEMO_MODE, demoPhotos, demoPhotoUrl } from "@/lib/demo";
 
 export async function GET() {
+  if (DEMO_MODE) {
+    return NextResponse.json({
+      rows: demoPhotos.map((p) => ({
+        id: p.id,
+        originalFilename: p.original_filename,
+        createdAt: p.created_at,
+        thumbnailUrl: demoPhotoUrl(p.id),
+      })),
+    });
+  }
+
   const admin = await getAdminSession();
   if (!admin) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
