@@ -19,7 +19,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { moveToFront } from "@/lib/reorder";
+import { moveToFront, sortByFilename } from "@/lib/reorder";
 
 type AdminPhotoRow = {
   id: string;
@@ -103,6 +103,9 @@ export function AdminPhotoGrid() {
   const [rows, setRows] = useState<AdminPhotoRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [save, setSave] = useState<SaveState>("idle");
+  const [confirmingDeleteAll, setConfirmingDeleteAll] = useState(false);
+  const [deleteText, setDeleteText] = useState("");
+  const [deletingAll, setDeletingAll] = useState(false);
   const savedTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const load = useCallback(async () => {
@@ -167,6 +170,27 @@ export function AdminPhotoGrid() {
     await fetch(`/api/admin/photos?id=${id}`, { method: "DELETE" });
   }
 
+  function handleSort(direction: "asc" | "desc") {
+    const label = direction === "asc" ? "A → Z" : "Z → A";
+    if (!confirm(`¿Ordenar las ${rows.length} fotos por nombre (${label})? Esto reemplaza el orden actual.`)) return;
+    applyOrder(sortByFilename(rows, direction));
+  }
+
+  async function handleDeleteAll() {
+    setDeletingAll(true);
+    try {
+      const res = await fetch("/api/admin/photos?all=1", { method: "DELETE" });
+      if (!res.ok) throw new Error(String(res.status));
+      setRows([]);
+      setConfirmingDeleteAll(false);
+      setDeleteText("");
+    } catch {
+      setSave("error");
+      await load();
+    }
+    setDeletingAll(false);
+  }
+
   if (loading) return <p className="text-foreground/60">Cargando fotos...</p>;
   if (rows.length === 0) return <p className="text-foreground/60">Todavía no subiste fotos.</p>;
 
@@ -186,6 +210,71 @@ export function AdminPhotoGrid() {
         {save === "saved" && "Orden guardado"}
         {save === "error" && "No se pudo guardar. Se recargó el orden real."}
       </p>
+
+      <div className="flex flex-wrap gap-2 text-xs uppercase tracking-widest">
+        <button
+          type="button"
+          onClick={() => handleSort("asc")}
+          className="border border-ash px-3 py-2 text-foreground/80"
+        >
+          Ordenar A → Z
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSort("desc")}
+          className="border border-ash px-3 py-2 text-foreground/80"
+        >
+          Z → A
+        </button>
+        <button
+          type="button"
+          onClick={() => setConfirmingDeleteAll(true)}
+          className="ml-auto border border-blood/60 px-3 py-2 text-blood-bright"
+        >
+          Borrar todas
+        </button>
+      </div>
+
+      {confirmingDeleteAll && (
+        <div role="alertdialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
+          <div className="w-full max-w-sm border border-blood bg-panel p-6">
+            <h2 className="title-glow font-display text-3xl text-blood-bright">¿Borrar las {rows.length} fotos?</h2>
+            <p className="mt-3 text-sm leading-relaxed text-foreground/80">
+              Se eliminan del almacenamiento y de la galería, junto con el historial de descargas, y el plazo de 7
+              días se reinicia. <strong className="text-foreground">No se puede deshacer.</strong>
+            </p>
+            <label className="mt-4 block text-xs uppercase tracking-widest text-foreground/60">
+              Escribe BORRAR para confirmar
+              <input
+                value={deleteText}
+                onChange={(e) => setDeleteText(e.target.value)}
+                autoFocus
+                autoComplete="off"
+                className="mt-2 w-full border border-ash bg-background px-4 py-3 text-base normal-case tracking-normal text-foreground outline-none focus:border-blood"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={handleDeleteAll}
+              disabled={deleteText.trim().toUpperCase() !== "BORRAR" || deletingAll}
+              className="mt-4 w-full border border-blood bg-blood/90 px-4 py-3 font-display text-lg tracking-widest text-foreground disabled:opacity-40"
+            >
+              {deletingAll ? "Borrando…" : "Borrar todo"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setConfirmingDeleteAll(false);
+                setDeleteText("");
+              }}
+              disabled={deletingAll}
+              className="mt-2 w-full px-4 py-2 text-xs uppercase tracking-widest text-foreground/60"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={rows.map((r) => r.id)} strategy={rectSortingStrategy}>

@@ -19,3 +19,19 @@ export function isCompleteOrder(orderedIds: string[], existingIds: string[]): bo
   }
   return true;
 }
+
+const collator = new Intl.Collator("es", { numeric: true, sensitivity: "base" });
+
+/**
+ * Ordena por nombre de archivo de forma "natural": ignora mayúsculas y acentos y compara los números como
+ * números (…-2 antes que …-10, 002 antes que 010). Devuelve una lista nueva; el id desempata.
+ */
+export function sortByFilename<T extends { id: string; originalFilename: string }>(
+  items: T[],
+  direction: "asc" | "desc" = "asc"
+): T[] {
+  const sign = direction === "asc" ? 1 : -1;
+  return [...items].sort(
+    (a, b) => sign * collator.compare(a.originalFilename, b.originalFilename) || a.id.localeCompare(b.id)
+  );
+}

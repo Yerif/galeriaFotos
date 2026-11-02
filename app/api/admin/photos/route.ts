@@ -162,9 +162,14 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const admin = await getAdminSession();
-  if (!admin) {
+  if (!DEMO_MODE && !(await getAdminSession())) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Borrar TODAS las fotos. Exige all=1 explícito para que un id omitido nunca borre todo por accidente.
+  if (request.nextUrl.searchParams.get("all") === "1") {
+    if (DEMO_MODE) return NextResponse.json({ ok: true, deleted: 0 });
+    return deleteAllPhotos();
   }
 
   const id = request.nextUrl.searchParams.get("id");
@@ -195,4 +200,39 @@ export async function DELETE(request: NextRequest) {
   }
 
   return NextResponse.json({ ok: true });
+}
+
+async function deleteAllPhotos() {
+  const supabase = createAdminClient();
+
+  const { data: photos, error: listError } = await supabase
+    .from("photos")
+    .select("storage_path_display, storage_path_thumb");
+  if (listError) {
+    return NextResponse.json({ error: "query_failed", detail: listError.message }, { status: 500 });
+  }
+
+  // Storage permite borrar hasta 1000 objetos por llamada.
+  const paths = (photos ?? []).flatMap((p) => [p.storage_path_display, p.storage_path_thumb]);
+  for (let i = 0; i < paths.length; i += 1000) {
+    const { error } = await supabase.storage.from("photos").remove(paths.slice(i, i + 1000));
+    if (error) {
+      return NextResponse.json({ error: "storage_failed", detail: error.message }, { status: 500 });
+    }
+  }
+
+  // También se borra el historial de descargas (on delete cascade).
+  const { error: deleteError } = await supabase.from("photos").delete().not("id", "is", null);
+  if (deleteError) {
+    return NextResponse.json({ error: "delete_failed", detail: deleteError.message }, { status: 500 });
+  }
+
+  // Sin fotos no hay plazo: si no se reinicia, las fotos nuevas heredarían un plazo viejo (quizá ya vencido)
+  // porque el trigger solo fija los 7 días cuando deadline_at es nulo.
+  await supabase
+    .from("event")
+    .update({ first_photo_uploaded_at: null, deadline_at: null, deadline_overridden: false })
+    .not("id", "is", null);
+
+  return NextResponse.json({ ok: true, deleted: photos?.length ?? 0 });
 }
