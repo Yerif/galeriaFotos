@@ -1,12 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900">
-  <defs>
-    <filter id="grain3">
-      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
-      <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.08 0"/>
-    </filter>
-  </defs>
-  <rect width="900" height="900" fill="#120d0d"/>
-  <rect width="900" height="900" filter="url(#grain3)"/>
-  <line x1="0" y1="220" x2="900" y2="220" stroke="#9a1115" stroke-width="2" opacity="0.5"/>
-  <text x="50%" y="92%" font-family="monospace" font-size="22" fill="#9a1115" text-anchor="middle" opacity="0.85" letter-spacing="4">FRAME 03</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs><filter id="g3"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.08 0"/></filter></defs>
+  <rect width="1000" height="1000" fill="#120d0d"/>
+  <rect width="1000" height="1000" filter="url(#g3)"/>
+  <line x1="0" y1="272" x2="1000" y2="272" stroke="#9a1115" stroke-width="2" opacity="0.5"/>
+  <text x="50%" y="50%" font-family="monospace" font-size="35" fill="#9a1115" text-anchor="middle" opacity="0.85" letter-spacing="4">FRAME 03 · 1000x1000</text>
 </svg>

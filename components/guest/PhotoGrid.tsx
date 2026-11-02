@@ -9,9 +9,9 @@ export function PhotoGrid({
   onOpen: (index: number) => void;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+    <div className="justified">
       {photos.map((photo, index) => (
-        <PhotoThumb key={photo.id} photoId={photo.id} onOpen={() => onOpen(index)} />
+        <PhotoThumb key={photo.id} photo={photo} index={index} onOpen={() => onOpen(index)} />
       ))}
     </div>
   );

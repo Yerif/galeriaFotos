@@ -185,6 +185,78 @@ body::after {
   animation: stamp var(--dur-base) var(--ease-out) both;
 }
 
+/* Grilla justificada (filas de igual altura, sin recortes) en CSS puro.
+   Cada celda declara --w/--h (dimensiones reales de la foto): crece en proporción a su
+   relación de aspecto y reserva su altura con aspect-ratio, así no hay saltos de layout. */
+.justified {
+  --row-h: 100px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Evita que la última fila se estire hasta ocupar todo el ancho. */
+.justified::after {
+  content: "";
+  flex-grow: 1e4;
+}
+
+.jitem {
+  position: relative;
+  overflow: hidden;
+  flex-grow: calc(var(--w) / var(--h) * 100);
+  flex-basis: calc(var(--w) / var(--h) * var(--row-h));
+  aspect-ratio: var(--w) / var(--h);
+  /* aspect-ratio mantiene la altura aunque el contenido esté fuera de pantalla. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--row-h);
+}
+
+.jitem > button {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.jitem > button:active {
+  transform: scale(0.97);
+}
+
+@media (min-width: 640px) {
+  .justified {
+    --row-h: 190px;
+  }
+}
+
+/* Invisible hasta que carga; entra con el mismo reveal-up escalonado por --i. */
+.thumb-img {
+  opacity: 0;
+}
+
+.thumb-img.is-loaded {
+  opacity: 1;
+  animation: reveal-up var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
+/* Entrada por scroll (solo compositor). Mejora progresiva: sin soporte no pasa nada. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .jitem {
+      animation: jitem-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+@keyframes jitem-in {
+  from {
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    transform: none;
+  }
+}
+
 :focus-visible {
   outline: 2px solid var(--color-blood-bright);
   outline-offset: 2px;
