@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getEventStatus } from "@/lib/event";
 import { DEMO_MODE, demoPhotoUrl } from "@/lib/demo";
+import { attachmentDisposition, toJpgFilename } from "@/lib/filename";
 
 export async function GET(
   request: NextRequest,
@@ -62,7 +63,7 @@ export async function GET(
   return new NextResponse(buffer, {
     headers: {
       "Content-Type": photo.content_type,
-      "Content-Disposition": `attachment; filename="${photo.original_filename.replace(/"/g, "")}"`,
+      "Content-Disposition": attachmentDisposition(toJpgFilename(photo.original_filename)),
       "Content-Length": String(buffer.byteLength),
     },
   });

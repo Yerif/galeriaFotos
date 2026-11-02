@@ -257,6 +257,55 @@ body::after {
   }
 }
 
+/* Lightbox (yet-another-react-lightbox) tematizado. Los filtros drop-shadow por defecto se quitan. */
+.yarl__portal {
+  --yarl__color_backdrop: #000;
+  --yarl__color_button: rgba(231, 224, 210, 0.85);
+  --yarl__color_button_active: #ffffff;
+  --yarl__slide_icon_loading_color: var(--color-blood-bright);
+  --yarl__button_filter: none;
+  --yarl__counter_filter: none;
+  --yarl__counter_color: rgba(231, 224, 210, 0.75);
+}
+
+.yarl__container {
+  animation: flicker-in 500ms linear both;
+}
+
+.yarl__slide_image {
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+/* En pantallas táctiles se acerca con pellizco o doble toque: los botones de zoom sobran. */
+@media (pointer: coarse) {
+  .yarl__toolbar button[aria-label="Acercar"],
+  .yarl__toolbar button[aria-label="Alejar"] {
+    display: none;
+  }
+}
+
+.lb-slide {
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.lb-download-bar {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  padding: 0 1rem max(1.25rem, env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+
+.lb-download-bar > * {
+  pointer-events: auto;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-blood-bright);
   outline-offset: 2px;
